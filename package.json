@@ -1,0 +1,22 @@
+{
+  "name": "lalog",
+  "version": "0.0.1",
+  "description": "Logging aggregation and distribution",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/guyellis/lalog.git"
+  },
+  "keywords": [
+    "logging"
+  ],
+  "author": "Guy Ellis <wildfiction@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/guyellis/lalog/issues"
+  },
+  "homepage": "https://github.com/guyellis/lalog#readme"
+}

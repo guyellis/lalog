@@ -1,22 +1,46 @@
 {
-  "name": "lalog",
-  "version": "0.0.1",
+  "author": "Guy Ellis <wildfiction@gmail.com>",
+  "bugs": {
+    "url": "https://github.com/guyellis/lalog/issues"
+  },
   "description": "Logging aggregation and distribution",
+  "devDependencies": {
+    "eslint": "4.19.1",
+    "eslint-config-airbnb-base": "12.1.0",
+    "eslint-plugin-import": "2.11.0",
+    "eslint-plugin-jest": "21.15.1",
+    "eslint-plugin-security": "1.4.0",
+    "jest": "22.4.3",
+    "pre-commit": "1.2.2"
+  },
+  "engines": {
+    "node": ">=10",
+    "npm": ">=6"
+  },
+  "homepage": "https://github.com/guyellis/lalog#readme",
+  "keywords": [
+    "logging"
+  ],
+  "license": "MIT",
   "main": "lib/index.js",
-  "scripts": {
-    "test": "jest"
+  "name": "lalog",
+  "pre-commit": {
+    "colors": true,
+    "run": [
+      "lint",
+      "coverage"
+    ],
+    "silent": false
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/guyellis/lalog.git"
   },
-  "keywords": [
-    "logging"
-  ],
-  "author": "Guy Ellis <wildfiction@gmail.com>",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/guyellis/lalog/issues"
+  "scripts": {
+    "coverage": "jest --coverage",
+    "lint": "eslint --ext .js .",
+    "lintfix": "eslint --ext .js . --fix",
+    "test": "jest"
   },
-  "homepage": "https://github.com/guyellis/lalog#readme"
+  "version": "0.0.1"
 }

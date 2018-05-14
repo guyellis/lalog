@@ -29,4 +29,39 @@ describe('/lib/logger', () => {
     logger.info(req);
     expect(loggerWrite).toHaveBeenCalledWith(1, req);
   });
+
+  test('should get all Levels', () => {
+    const actual = Logger.allLevels();
+    const expected = ['trace', 'info', 'warn', 'error', 'fatal', 'security'];
+    expect(actual).toEqual(expected);
+  });
+
+  test('should get/set Levels', () => {
+    let previousLevel = Logger.getLevel();
+    expect(previousLevel).toBe('error');
+    previousLevel = Logger.setLevel('warn');
+    // returns previous level because set succeeded
+    expect(previousLevel).toBe('error');
+    previousLevel = Logger.setLevel('this is rubbish');
+    // returns current level because set failed
+    expect(previousLevel).toBe('warn');
+  });
+
+  test('should parse request object', () => {
+    const object = {
+      body: 1,
+      headers: 2,
+      method: 3,
+      params: 4,
+      path: 5,
+      query: 6,
+      url: 7,
+      user: 8,
+      rubbish: 9,
+    };
+    const actual = Logger.parseReq(object);
+    delete object.rubbish;
+    expect(actual).toEqual(object);
+    expect(actual).not.toBe(object);
+  });
 });

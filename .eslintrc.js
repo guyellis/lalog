@@ -18,5 +18,6 @@ module.exports = {
     "jest/no-identical-title": [2],
     "jest/prefer-to-have-length": [2],
     "jest/valid-expect": [2],
+    "security/detect-object-injection": [0]
   }
 };

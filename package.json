@@ -37,10 +37,17 @@
     "url": "git+https://github.com/guyellis/lalog.git"
   },
   "scripts": {
+    "coverage-view": "google-chrome coverage/lcov-report/index.html",
     "coverage": "jest --coverage",
     "lint": "eslint --ext .js .",
     "lintfix": "eslint --ext .js . --fix",
     "test": "jest"
   },
-  "version": "0.0.1"
+  "version": "0.0.2",
+  "dependencies": {
+    "debug": "3.1.0",
+    "lodash": "4.17.10",
+    "uuid": "3.2.1",
+    "winston-loggly-bulk": "2.0.2"
+  }
 }

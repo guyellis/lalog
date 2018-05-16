@@ -52,13 +52,36 @@ describe('/lib/loggly-wrapper', () => {
     };
 
     jest.spyOn(global.console, 'error');
-    // console.log.bind(console, jest.fn());
     mockWinston.log = jest.fn((level, json, cb) => cb('fake error'));
 
     await logger.error(req);
     expect(mockWinston.log).toHaveBeenCalled();
     // eslint-disable-next-line no-console
     expect(console.error).toHaveBeenCalled();
-    // console.log.bind(console, consoleLog);
+  });
+
+  test('should call res.send', async () => {
+    const response = {
+      code: 1234,
+      res: {
+        status: (c) => {
+          expect(c).toBe(1234);
+          return response.res;
+        },
+        send: (obj) => {
+          expect(obj.success).toBe(false);
+        },
+      },
+    };
+
+    const req = {
+      ip: '1.2.3.4',
+      path: 'some path',
+      user: 'some user',
+    };
+
+    await logger.error(req, response);
+    expect(mockWinston.log).toHaveBeenCalled();
+    expect.assertions(3);
   });
 });

@@ -3,6 +3,12 @@
   "bugs": {
     "url": "https://github.com/guyellis/lalog/issues"
   },
+  "dependencies": {
+    "debug": "3.1.0",
+    "lodash": "4.17.10",
+    "uuid": "3.2.1",
+    "winston-loggly-bulk": "2.0.2"
+  },
   "description": "Logging aggregation and distribution",
   "devDependencies": {
     "eslint": "4.19.1",
@@ -37,17 +43,11 @@
     "url": "git+https://github.com/guyellis/lalog.git"
   },
   "scripts": {
-    "coverage-view": "google-chrome coverage/lcov-report/index.html",
     "coverage": "jest --coverage",
+    "coverage-view": "google-chrome coverage/lcov-report/index.html",
     "lint": "eslint --ext .js .",
     "lintfix": "eslint --ext .js . --fix",
     "test": "jest"
   },
-  "version": "0.0.2",
-  "dependencies": {
-    "debug": "3.1.0",
-    "lodash": "4.17.10",
-    "uuid": "3.2.1",
-    "winston-loggly-bulk": "2.0.2"
-  }
+  "version": "0.0.2"
 }

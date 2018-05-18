@@ -64,6 +64,28 @@ describe('/lib/loggly-wrapper', () => {
     expect(console.error).toHaveBeenCalledWith(expected);
   });
 
+  test('should add a stack if it is missing from err', async () => {
+    const req = {
+      ip: '1.2.3.4',
+      path: 'some path',
+      user: 'some user',
+      err: {
+        message: 'Will be used for missing msg',
+      },
+    };
+
+    mockWinston.log = jest.fn((level, json, cb) => {
+      expect(json.fullStack).toBeTruthy();
+      expect(json.shortStack).toBeTruthy();
+      expect(json.msg).toBe('Will be used for missing msg');
+      cb();
+    });
+
+    await logger.error(req);
+    expect(mockWinston.log).toHaveBeenCalledTimes(1);
+    expect.assertions(4);
+  });
+
   test('should call res.send', async () => {
     const response = {
       code: 1234,

@@ -21,16 +21,13 @@ const Logger = require('../../lib');
 
 const logger = Logger.create('test-service', 'test-logger');
 
+// Assign console to an object to check calls to console and supress
+// console to stdout
+global.console = {};
+
 describe('/lib/loggly-wrapper', () => {
-  beforeAll(() => {
-  });
-
   beforeEach(() => {
-    // loggerWrite = jest.fn();
-  });
-
-  afterEach(() => {
-    // loggerWrite.mockRestore();
+    global.console.error = jest.fn();
   });
 
   test('should log an error log', async () => {
@@ -51,13 +48,12 @@ describe('/lib/loggly-wrapper', () => {
       user: 'some user',
     };
 
-    jest.spyOn(global.console, 'error');
     mockWinston.log = jest.fn((level, json, cb) => cb('fake error'));
 
     await logger.error(req);
     expect(mockWinston.log).toHaveBeenCalled();
     // eslint-disable-next-line no-console
-    expect(console.error).toHaveBeenCalled();
+    expect(console.error).toHaveBeenCalledTimes(1);
   });
 
   test('should call res.send', async () => {
@@ -82,6 +78,8 @@ describe('/lib/loggly-wrapper', () => {
 
     await logger.error(req, response);
     expect(mockWinston.log).toHaveBeenCalled();
-    expect.assertions(3);
+    // eslint-disable-next-line no-console
+    expect(console.error).toHaveBeenCalledTimes(1);
+    expect.assertions(4);
   });
 });

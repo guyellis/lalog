@@ -15,11 +15,6 @@ jest.mock('winston', () => mockWinston);
 
 const Logger = require('../../lib');
 
-// let loggerWrite = jest.fn();
-// Logger.prototype.write = (levelIndex, logObject) => {
-//   loggerWrite(levelIndex, logObject);
-// };
-
 const logger = Logger.create('test-service', 'test-logger');
 
 // Assign console to an object to check calls to console and supress
@@ -33,14 +28,46 @@ describe('/lib/loggly-wrapper', () => {
   });
 
   test('should log an error log', async () => {
-    const req = {
+    const logObj = {
       ip: '1.2.3.4',
       path: 'some path',
       user: 'some user',
     };
 
-    await logger.error(req);
+    mockWinston.log = jest.fn((level, json, cb) => {
+      // If .error() is logged and no err prop is passed to
+      // method then an Error will be created for the stack
+      expect(json.fullStack).toBeTruthy();
+      expect(json.shortStack).toBeTruthy();
+      cb();
+    });
+
+    await logger.error(logObj);
     expect(mockWinston.log).toHaveBeenCalled();
+    expect.assertions(3);
+  });
+
+  test('should log a warning log and not create an Error', async () => {
+    Logger.setLevel('warn');
+
+    const logObj = {
+      ip: '1.2.3.4',
+      path: 'some path',
+      user: 'some user',
+    };
+
+    mockWinston.log = jest.fn((level, json, cb) => {
+      // If .warn() is logged and no err prop is passed to
+      // method then no Error created
+      expect(json.fullStack).toBeFalsy();
+      cb();
+    });
+
+    await logger.warn(logObj);
+    expect(mockWinston.log).toHaveBeenCalled();
+    expect.assertions(2);
+
+    Logger.setLevel('error');
   });
 
   test('should force Winston error', async () => {
@@ -85,6 +112,63 @@ describe('/lib/loggly-wrapper', () => {
     expect(mockWinston.log).toHaveBeenCalledTimes(1);
     expect.assertions(4);
   });
+
+  test('should use object message if present', async () => {
+    const req = {
+      ip: '1.2.3.4',
+      path: 'some path',
+      user: 'some user',
+      msg: 'root message',
+      err: {
+        message: 'error message',
+      },
+    };
+
+    mockWinston.log = jest.fn((level, json, cb) => {
+      expect(json.fullStack).toBeTruthy();
+      expect(json.shortStack).toBeTruthy();
+      expect(json.msg).toBe('root message');
+      cb();
+    });
+
+    await logger.error(req);
+    expect(mockWinston.log).toHaveBeenCalledTimes(1);
+    expect.assertions(4);
+  });
+
+  test('should not log if level is too low', async () => {
+    await logger.trace({});
+    expect(mockWinston.log).not.toHaveBeenCalled();
+  });
+
+  test('should parse a req object', async () => {
+    const logObj = {
+      req: {
+        body: 'body',
+        headers: 'headers',
+        method: 'method',
+        params: 'params',
+        path: 'path',
+        query: 'query',
+        url: 'url',
+        user: 'user',
+        random: 'random',
+      },
+    };
+
+    mockWinston.log = jest.fn((level, json, cb) => {
+      const { req } = json;
+      expect(req.body).toBe('body');
+      expect(req.url).toBe('url');
+      expect(req.random).toBeFalsy();
+      cb();
+    });
+
+    await logger.error(logObj);
+    expect(mockWinston.log).toHaveBeenCalledTimes(1);
+    expect.assertions(4);
+  });
+
 
   test('should call res.send', async () => {
     const response = {

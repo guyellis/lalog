@@ -5,7 +5,6 @@ jest.mock('winston-loggly-bulk', () => jest.fn());
 
 const mockWinston = {
   add: jest.fn(),
-  log: jest.fn((level, json, cb) => cb()),
   transports: {
     Loggly: 1,
   },
@@ -28,6 +27,7 @@ global.console = {};
 describe('/lib/loggly-wrapper', () => {
   beforeEach(() => {
     global.console.error = jest.fn();
+    mockWinston.log = jest.fn((level, json, cb) => cb());
   });
 
   test('should log an error log', async () => {
@@ -78,8 +78,13 @@ describe('/lib/loggly-wrapper', () => {
 
     await logger.error(req, response);
     expect(mockWinston.log).toHaveBeenCalled();
-    // eslint-disable-next-line no-console
-    expect(console.error).toHaveBeenCalledTimes(1);
-    expect.assertions(4);
+    expect.assertions(3);
+  });
+
+  test('should not call winston.log if LOGGLY_TOKEN has not been defined', async () => {
+    delete process.env.LOGGLY_TOKEN;
+    const logger2 = Logger.create('test-service-2', 'test-logger-2');
+    await logger2.error({});
+    expect(mockWinston.log).not.toHaveBeenCalled();
   });
 });

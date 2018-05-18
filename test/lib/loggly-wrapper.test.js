@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 process.env.LOGGLY_TOKEN = 'test-loggly-token';
 process.env.LOGGLY_SUBDOMAIN = 'test-loggly-subdomain';
 
@@ -52,8 +54,14 @@ describe('/lib/loggly-wrapper', () => {
 
     await logger.error(req);
     expect(mockWinston.log).toHaveBeenCalled();
-    // eslint-disable-next-line no-console
     expect(console.error).toHaveBeenCalledTimes(1);
+  });
+
+  test('should console.error if object not passed to log function', async () => {
+    await logger.error('i am a string');
+    expect(console.error).toHaveBeenCalledTimes(1);
+    const expected = 'Expecting an object in logger write method but got "string"';
+    expect(console.error).toHaveBeenCalledWith(expected);
   });
 
   test('should call res.send', async () => {
@@ -88,3 +96,5 @@ describe('/lib/loggly-wrapper', () => {
     expect(mockWinston.log).not.toHaveBeenCalled();
   });
 });
+
+/* eslint-enable no-console */

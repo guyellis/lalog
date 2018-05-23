@@ -70,6 +70,72 @@ describe('/lib/loggly-wrapper', () => {
     Logger.setLevel('error');
   });
 
+  describe('timer logging', () => {
+    test('should log a default timer log if level is info or lower', async () => {
+      Logger.setLevel('info');
+
+      const extraLogData = {
+        fake: 'fake-extra-data',
+      };
+
+      const originalDateNow = Date.now;
+      let dateNowCallCounter = 0;
+      // eslint-disable-next-line no-plusplus
+      Date.now = jest.fn(() => (dateNowCallCounter++ > 0 ? 5000 : 0));
+
+      mockWinston.log = jest.fn((level, json, cb) => {
+        expect(level).toBe('info'); // TODO: Make levels constants
+        expect(json).toEqual({
+          duration: '00:00:05.000',
+          fake: 'fake-extra-data',
+          level: 'info',
+          msg: 'Timer',
+          timerLabel: 'my-time-label',
+        });
+        cb();
+      });
+
+      await logger.time('my-time-label');
+      await logger.timeEnd('my-time-label', extraLogData);
+      expect(mockWinston.log).toHaveBeenCalled();
+      expect(Date.now).toHaveBeenCalledTimes(2);
+      expect.assertions(4);
+
+      Logger.setLevel('error');
+      Date.now = originalDateNow;
+    });
+
+    test('should not log a default timer log if level is higher than info', async () => {
+
+    });
+
+    test('should log an explicit level timer log', async () => {
+
+    });
+
+    test('should add a stack if timeEnd() label is missing', async () => {
+      Logger.setLevel('info');
+
+      mockWinston.log = jest.fn((level, json, cb) => {
+        expect(level).toBe('info');
+        const durationTextStart = 'Missing label "my-time-label-missing" in timeEnd()\n' +
+          'Error\n' +
+          '    at Logger.writeTimeEnd';
+        const { duration, timerLabel } = json;
+        expect(duration.startsWith(durationTextStart)).toBe(true);
+        expect(timerLabel).toBe('my-time-label-missing');
+        cb();
+      });
+
+      logger.time('my-time-label');
+      await logger.timeEnd('my-time-label-missing');
+      expect(mockWinston.log).toHaveBeenCalled();
+      expect.assertions(4);
+
+      Logger.setLevel('error');
+    });
+  });
+
   test('should force Winston error', async () => {
     const req = {
       ip: '1.2.3.4',
@@ -169,8 +235,7 @@ describe('/lib/loggly-wrapper', () => {
     expect.assertions(4);
   });
 
-
-  test('should call res.send', async () => {
+  test('should call res.send when response parameter is included', async () => {
     const response = {
       code: 1234,
       res: {
@@ -184,13 +249,13 @@ describe('/lib/loggly-wrapper', () => {
       },
     };
 
-    const req = {
+    const logData = {
       ip: '1.2.3.4',
       path: 'some path',
       user: 'some user',
     };
 
-    await logger.error(req, response);
+    await logger.error(logData, response);
     expect(mockWinston.log).toHaveBeenCalled();
     expect.assertions(3);
   });

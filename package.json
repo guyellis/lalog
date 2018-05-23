@@ -47,7 +47,7 @@
     "coverage-view": "google-chrome coverage/lcov-report/index.html",
     "lint": "eslint --ext .js .",
     "lintfix": "eslint --ext .js . --fix",
-    "test": "jest"
+    "test": "npm run lint && npm run coverage"
   },
-  "version": "0.0.3"
+  "version": "0.1.0"
 }

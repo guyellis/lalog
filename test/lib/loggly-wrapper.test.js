@@ -22,9 +22,17 @@ const logger = Logger.create('test-service', 'test-logger');
 global.console = {};
 
 describe('/lib/loggly-wrapper', () => {
+  beforeAll(() => {
+    // Set log level to "error" before tests start running
+    Logger.setLevel('error');
+  });
   beforeEach(() => {
     global.console.error = jest.fn();
     mockWinston.log = jest.fn((level, json, cb) => cb());
+  });
+  afterEach(() => {
+    // Reset log level to "error" after each test in case it was changed
+    Logger.setLevel('error');
   });
 
   test('should log an error log', async () => {
@@ -66,8 +74,6 @@ describe('/lib/loggly-wrapper', () => {
     await logger.warn(logObj);
     expect(mockWinston.log).toHaveBeenCalled();
     expect.assertions(2);
-
-    Logger.setLevel('error');
   });
 
   describe('timer logging', () => {
@@ -101,16 +107,49 @@ describe('/lib/loggly-wrapper', () => {
       expect(Date.now).toHaveBeenCalledTimes(2);
       expect.assertions(4);
 
-      Logger.setLevel('error');
       Date.now = originalDateNow;
     });
 
     test('should not log a default timer log if level is higher than info', async () => {
+      mockWinston.log = jest.fn(() => {});
 
+      await logger.time('my-time-label');
+      await logger.timeEnd('my-time-label');
+      expect(mockWinston.log).not.toHaveBeenCalled();
     });
 
     test('should log an explicit level timer log', async () => {
+      const extraLogData = {
+        fake: 'fake-extra-data',
+      };
 
+      const originalDateNow = Date.now;
+      let dateNowCallCounter = 0;
+      // eslint-disable-next-line no-plusplus
+      Date.now = jest.fn(() => (dateNowCallCounter++ > 0 ? 5000 : 0));
+
+      mockWinston.log = jest.fn((level, json, cb) => {
+        const {
+          duration, fake, level: jsonLevel, msg, timerLabel, shortStack, fullStack,
+        } = json;
+        expect(level).toBe('error');
+        expect(duration).toBe('00:00:05.000');
+        expect(fake).toBe('fake-extra-data');
+        expect(jsonLevel).toBe('error');
+        expect(msg).toBe('Timer');
+        expect(timerLabel).toBe('my-time-label');
+        expect(shortStack).toBeTruthy();
+        expect(fullStack).toBeTruthy();
+        cb();
+      });
+
+      await logger.time('my-time-label');
+      await logger.timeEnd.error('my-time-label', extraLogData);
+      expect(mockWinston.log).toHaveBeenCalled();
+      expect(Date.now).toHaveBeenCalledTimes(2);
+      expect.assertions(10);
+
+      Date.now = originalDateNow;
     });
 
     test('should add a stack if timeEnd() label is missing', async () => {
@@ -131,8 +170,6 @@ describe('/lib/loggly-wrapper', () => {
       await logger.timeEnd('my-time-label-missing');
       expect(mockWinston.log).toHaveBeenCalled();
       expect.assertions(4);
-
-      Logger.setLevel('error');
     });
   });
 

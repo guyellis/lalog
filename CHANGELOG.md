@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.1.1
+
+- Don't override errorId if it's passed in as part of the log object.
+
 ### 0.1.0
 
 - Add `console` style `time(<label>)` and `timeEnd(<label>, [optional object])` functionality.

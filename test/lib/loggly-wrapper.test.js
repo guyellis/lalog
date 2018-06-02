@@ -3,15 +3,9 @@
 process.env.LOGGLY_TOKEN = 'test-loggly-token';
 process.env.LOGGLY_SUBDOMAIN = 'test-loggly-subdomain';
 
-jest.mock('winston-loggly-bulk', () => jest.fn());
+const fetch = require('node-fetch');
 
-const mockWinston = {
-  add: jest.fn(),
-  transports: {
-    Loggly: 1,
-  },
-};
-jest.mock('winston', () => mockWinston);
+jest.mock('node-fetch');
 
 const Logger = require('../../lib');
 
@@ -28,7 +22,8 @@ describe('/lib/loggly-wrapper', () => {
   });
   beforeEach(() => {
     global.console.error = jest.fn();
-    mockWinston.log = jest.fn((level, json, cb) => cb());
+    global.console.warn = jest.fn();
+    fetch.mockReset();
   });
   afterEach(() => {
     // Reset log level to "error" after each test in case it was changed
@@ -42,17 +37,11 @@ describe('/lib/loggly-wrapper', () => {
       user: 'some user',
     };
 
-    mockWinston.log = jest.fn((level, json, cb) => {
-      // If .error() is logged and no err prop is passed to
-      // method then an Error will be created for the stack
-      expect(json.fullStack).toBeTruthy();
-      expect(json.shortStack).toBeTruthy();
-      cb();
-    });
+    const resp = { status: 200, json: () => ({}) };
+    fetch.mockResolvedValue(resp);
 
     await logger.error(logObj);
-    expect(mockWinston.log).toHaveBeenCalled();
-    expect.assertions(3);
+    expect(fetch).toHaveBeenCalledTimes(1);
   });
 
   test('should log a warning log and not create an Error', async () => {
@@ -64,16 +53,11 @@ describe('/lib/loggly-wrapper', () => {
       user: 'some user',
     };
 
-    mockWinston.log = jest.fn((level, json, cb) => {
-      // If .warn() is logged and no err prop is passed to
-      // method then no Error created
-      expect(json.fullStack).toBeFalsy();
-      cb();
-    });
+    const resp = { status: 200, json: () => ({}) };
+    fetch.mockResolvedValue(resp);
 
     await logger.warn(logObj);
-    expect(mockWinston.log).toHaveBeenCalled();
-    expect.assertions(2);
+    expect(fetch).toHaveBeenCalledTimes(1);
   });
 
   describe('timer logging', () => {
@@ -89,9 +73,11 @@ describe('/lib/loggly-wrapper', () => {
       // eslint-disable-next-line no-plusplus
       Date.now = jest.fn(() => (dateNowCallCounter++ > 0 ? 5000 : 0));
 
-      mockWinston.log = jest.fn((level, json, cb) => {
-        expect(level).toBe('info'); // TODO: Make levels constants
-        expect(json).toEqual({
+      fetch.mockImplementation((url, options) => {
+        expect(url).toBe('https://logs-01.loggly.com/inputs/test-loggly-token/tag/test-service-development/');
+        expect(options.method).toBe('POST');
+        const body = JSON.parse(options.body);
+        expect(body).toEqual({
           duration: '00:00:05.000',
           fake: 'fake-extra-data',
           level: 'info',
@@ -99,24 +85,25 @@ describe('/lib/loggly-wrapper', () => {
           timerLabel: 'my-time-label',
           module: 'test-logger',
         });
-        cb();
+        return { status: 200, json: () => ({}) };
       });
 
       await logger.time('my-time-label');
       await logger.timeEnd('my-time-label', extraLogData);
-      expect(mockWinston.log).toHaveBeenCalled();
+      expect(fetch).toHaveBeenCalledTimes(1);
       expect(Date.now).toHaveBeenCalledTimes(2);
-      expect.assertions(4);
+      expect.assertions(5);
 
       Date.now = originalDateNow;
     });
 
     test('should not log a default timer log if level is higher than info', async () => {
-      mockWinston.log = jest.fn(() => {});
+      const resp = { status: 200, json: () => ({}) };
+      fetch.mockResolvedValue(resp);
 
       await logger.time('my-time-label');
       await logger.timeEnd('my-time-label');
-      expect(mockWinston.log).not.toHaveBeenCalled();
+      expect(fetch).not.toHaveBeenCalled();
     });
 
     test('should log an explicit level timer log', async () => {
@@ -129,26 +116,28 @@ describe('/lib/loggly-wrapper', () => {
       // eslint-disable-next-line no-plusplus
       Date.now = jest.fn(() => (dateNowCallCounter++ > 0 ? 5000 : 0));
 
-      mockWinston.log = jest.fn((level, json, cb) => {
+      fetch.mockImplementation((url, options) => {
+        expect(url).toBe('https://logs-01.loggly.com/inputs/test-loggly-token/tag/test-service-development/');
+        expect(options.method).toBe('POST');
+        const body = JSON.parse(options.body);
         const {
-          duration, fake, level: jsonLevel, msg, timerLabel, shortStack, fullStack,
-        } = json;
+          level, duration, fake, msg, timerLabel, shortStack, fullStack,
+        } = body;
         expect(level).toBe('error');
         expect(duration).toBe('00:00:05.000');
         expect(fake).toBe('fake-extra-data');
-        expect(jsonLevel).toBe('error');
         expect(msg).toBe('Timer');
         expect(timerLabel).toBe('my-time-label');
         expect(shortStack).toBeTruthy();
         expect(fullStack).toBeTruthy();
-        cb();
+        return { status: 200, json: () => ({}) };
       });
 
       await logger.time('my-time-label');
       await logger.timeEnd.error('my-time-label', extraLogData);
-      expect(mockWinston.log).toHaveBeenCalled();
+      expect(fetch).toHaveBeenCalledTimes(1);
       expect(Date.now).toHaveBeenCalledTimes(2);
-      expect.assertions(10);
+      expect.assertions(11);
 
       Date.now = originalDateNow;
     });
@@ -156,35 +145,42 @@ describe('/lib/loggly-wrapper', () => {
     test('should add a stack if timeEnd() label is missing', async () => {
       Logger.setLevel('info');
 
-      mockWinston.log = jest.fn((level, json, cb) => {
+      fetch.mockImplementation((url, options) => {
+        expect(url).toBe('https://logs-01.loggly.com/inputs/test-loggly-token/tag/test-service-development/');
+        expect(options.method).toBe('POST');
+        const body = JSON.parse(options.body);
+        const {
+          level, duration, timerLabel,
+        } = body;
+
         expect(level).toBe('info');
         const durationTextStart = 'Missing label "my-time-label-missing" in timeEnd()\n' +
           'Error\n' +
           '    at Logger.writeTimeEnd';
-        const { duration, timerLabel } = json;
         expect(duration.startsWith(durationTextStart)).toBe(true);
         expect(timerLabel).toBe('my-time-label-missing');
-        cb();
+
+        return { status: 200, json: () => ({}) };
       });
 
       logger.time('my-time-label');
       await logger.timeEnd('my-time-label-missing');
-      expect(mockWinston.log).toHaveBeenCalled();
-      expect.assertions(4);
+      expect(fetch).toHaveBeenCalledTimes(1);
+      expect.assertions(6);
     });
   });
 
-  test('should force Winston error', async () => {
-    const req = {
-      ip: '1.2.3.4',
-      path: 'some path',
-      user: 'some user',
-    };
+  test('should force fetch() error', async () => {
+    Logger.setLevel('info');
+    const req = {};
 
-    mockWinston.log = jest.fn((level, json, cb) => cb('fake error'));
+    fetch.mockImplementation(() => {
+      throw new Error('fake error');
+    });
 
-    await logger.error(req);
-    expect(mockWinston.log).toHaveBeenCalled();
+    const result = await logger.info(req);
+    expect(result).toEqual({});
+    expect(fetch).toHaveBeenCalledTimes(1);
     expect(console.error).toHaveBeenCalledTimes(1);
   });
 
@@ -205,16 +201,24 @@ describe('/lib/loggly-wrapper', () => {
       },
     };
 
-    mockWinston.log = jest.fn((level, json, cb) => {
-      expect(json.fullStack).toBeTruthy();
-      expect(json.shortStack).toBeTruthy();
-      expect(json.msg).toBe('Will be used for missing msg');
-      cb();
+    fetch.mockImplementation((url, options) => {
+      expect(url).toBe('https://logs-01.loggly.com/inputs/test-loggly-token/tag/test-service-development/');
+      expect(options.method).toBe('POST');
+      const body = JSON.parse(options.body);
+      const {
+        fullStack, shortStack, msg,
+      } = body;
+
+      expect(fullStack).toBeTruthy();
+      expect(shortStack).toBeTruthy();
+      expect(msg).toBe('Will be used for missing msg');
+
+      return { status: 200, json: () => ({}) };
     });
 
     await logger.error(req);
-    expect(mockWinston.log).toHaveBeenCalledTimes(1);
-    expect.assertions(4);
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect.assertions(6);
   });
 
   test('should use object message if present', async () => {
@@ -228,21 +232,27 @@ describe('/lib/loggly-wrapper', () => {
       },
     };
 
-    mockWinston.log = jest.fn((level, json, cb) => {
-      expect(json.fullStack).toBeTruthy();
-      expect(json.shortStack).toBeTruthy();
-      expect(json.msg).toBe('root message');
-      cb();
+    fetch.mockImplementation((url, options) => {
+      const body = JSON.parse(options.body);
+      const {
+        fullStack, shortStack, msg,
+      } = body;
+
+      expect(fullStack).toBeTruthy();
+      expect(shortStack).toBeTruthy();
+      expect(msg).toBe('root message');
+
+      return { status: 200, json: () => ({}) };
     });
 
     await logger.error(req);
-    expect(mockWinston.log).toHaveBeenCalledTimes(1);
+    expect(fetch).toHaveBeenCalledTimes(1);
     expect.assertions(4);
   });
 
   test('should not log if level is too low', async () => {
     await logger.trace({});
-    expect(mockWinston.log).not.toHaveBeenCalled();
+    expect(fetch).not.toHaveBeenCalled();
   });
 
   test('should parse a req object', async () => {
@@ -260,16 +270,19 @@ describe('/lib/loggly-wrapper', () => {
       },
     };
 
-    mockWinston.log = jest.fn((level, json, cb) => {
-      const { req } = json;
+    fetch.mockImplementation((url, options) => {
+      const body = JSON.parse(options.body);
+
+      const { req } = body;
       expect(req.body).toBe('body');
       expect(req.url).toBe('url');
       expect(req.random).toBeFalsy();
-      cb();
+
+      return { status: 200, json: () => ({}) };
     });
 
     await logger.error(logObj);
-    expect(mockWinston.log).toHaveBeenCalledTimes(1);
+    expect(fetch).toHaveBeenCalledTimes(1);
     expect.assertions(4);
   });
 
@@ -293,18 +306,34 @@ describe('/lib/loggly-wrapper', () => {
       user: 'some user',
     };
 
+    const resp = { status: 200, json: () => ({}) };
+    fetch.mockResolvedValue(resp);
+
     await logger.error(logData, response);
-    expect(mockWinston.log).toHaveBeenCalled();
+    expect(fetch).toHaveBeenCalledTimes(1);
     expect.assertions(3);
   });
 
-  // TODO: Loggly instance already created at this point.
-  // eslint-disable-next-line jest/no-disabled-tests
-  test.skip('should not call winston.log if LOGGLY_TOKEN has not been defined', async () => {
+  test('should console.error() a non-200 status from Loggly', async () => {
+    const logData = {};
+
+    const resp = { status: 500, json: () => ({}) };
+    fetch.mockResolvedValue(resp);
+
+    const result = await logger.error(logData);
+    expect(result).toEqual({});
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(console.error).toHaveBeenCalledTimes(1);
+    expect(console.error).toHaveBeenLastCalledWith('fetch() call failed with 500');
+  });
+
+  test('should not call fetch() if LOGGLY_TOKEN has not been defined', async () => {
     delete process.env.LOGGLY_TOKEN;
-    const logger2 = Logger.create('test-service-2', 'test-logger-2');
-    await logger2.error({});
-    expect(mockWinston.log).not.toHaveBeenCalled();
+    // const logger2 = Logger.create('test-service-2', 'test-logger-2');
+    await logger.error({});
+    expect(fetch).not.toHaveBeenCalled();
+    expect(console.warn).toHaveBeenCalledTimes(1);
+    expect(console.warn).toHaveBeenLastCalledWith('loggly token has not been defined');
   });
 });
 

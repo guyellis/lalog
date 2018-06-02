@@ -4,6 +4,7 @@
 
 - Fix bug where Loggly instance can only be created once
 - Add 'module' name property to logged object
+- Switch from `winston` to calling Loggly API directly.
 
 ### 0.1.1
 

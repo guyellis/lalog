@@ -64,4 +64,28 @@ describe('/lib/logger', () => {
     expect(actual).toEqual(object);
     expect(actual).not.toBe(object);
   });
+
+  test('should call create() multiple times without problem', async () => {
+    const logger1 = Logger.create('fake-service-1', 'fake-module-1');
+
+    const logger2 = Logger.create('fake-service-1', 'fake-module-2');
+
+    const logger3 = Logger.create('fake-service-3', 'fake-module-2');
+
+    expect(logger1).not.toBe(logger2);
+    expect(logger1).not.toBe(logger3);
+    expect(logger2).not.toBe(logger3);
+  });
+
+  test('should new Logger() multiple times without problem', async () => {
+    const logger1 = new Logger('fake-service-1', 'fake-module-1');
+
+    const logger2 = new Logger('fake-service-1', 'fake-module-2');
+
+    const logger3 = new Logger('fake-service-3', 'fake-module-2');
+
+    expect(logger1).not.toBe(logger2);
+    expect(logger1).not.toBe(logger3);
+    expect(logger2).not.toBe(logger3);
+  });
 });

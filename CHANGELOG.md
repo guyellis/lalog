@@ -1,5 +1,11 @@
 # Changelog
 
+### 0.2.0
+
+- Breaking: `Logger` constructor and `.create()` now take a single `options` object
+argument instead of a `service` and `name` argument. The `options` should have `serviceName`
+and `moduleName` props and can optionally have a `presets` prop.
+
 ### 0.1.2
 
 - Fix bug where Loggly instance can only be created once

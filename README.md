@@ -32,17 +32,23 @@ const Logger = require('lalog');
 Create a logger:
 
 ```
-const logger = Logger.create('service-name', 'module-name');
+const logger = Logger.create({
+  serviceName: 'service-name',
+  moduleName: 'module-name',
+});
 ```
 
 or
 
 ```
-const logger = new Logger('service-name', 'module-name');
+const logger = new Logger({
+  serviceName: 'service-name',
+  moduleName: 'module-name',
+});
 ```
 
-`lalog` uses `debug` as one of its destinations. The `service-name` and `module-name` allow you
-to filter `debug` messages.
+`lalog` uses `debug` as one of its destinations. The `serviceName` and `moduleName` props allow
+you to filter `debug` messages.
 
 ### Write Log Messages
 

@@ -9,7 +9,10 @@ jest.mock('node-fetch');
 
 const Logger = require('../../lib');
 
-const logger = Logger.create('test-service', 'test-logger');
+const logger = Logger.create({
+  serviceName: 'test-service',
+  moduleName: 'test-logger',
+});
 
 // Assign console to an object to check calls to console and supress
 // console to stdout

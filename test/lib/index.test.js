@@ -5,7 +5,10 @@ Logger.prototype.write = (levelIndex, logObject) => {
   loggerWrite(levelIndex, logObject);
 };
 
-const logger = Logger.create('test-service', 'test-logger');
+const logger = Logger.create({
+  serviceName: 'test-service',
+  moduleName: 'test-logger',
+});
 
 describe('/lib/logger', () => {
   beforeEach(() => {
@@ -66,11 +69,11 @@ describe('/lib/logger', () => {
   });
 
   test('should call create() multiple times without problem', async () => {
-    const logger1 = Logger.create('fake-service-1', 'fake-module-1');
+    const logger1 = Logger.create({ serviceName: 'fake-service-1', moduleName: 'fake-module-1' });
 
-    const logger2 = Logger.create('fake-service-1', 'fake-module-2');
+    const logger2 = Logger.create({ serviceName: 'fake-service-1', moduleName: 'fake-module-2' });
 
-    const logger3 = Logger.create('fake-service-3', 'fake-module-2');
+    const logger3 = Logger.create({ serviceName: 'fake-service-3', moduleName: 'fake-module-2' });
 
     expect(logger1).not.toBe(logger2);
     expect(logger1).not.toBe(logger3);
@@ -78,14 +81,23 @@ describe('/lib/logger', () => {
   });
 
   test('should new Logger() multiple times without problem', async () => {
-    const logger1 = new Logger('fake-service-1', 'fake-module-1');
+    const logger1 = new Logger({ serviceName: 'fake-service-1', moduleName: 'fake-module-1' });
 
-    const logger2 = new Logger('fake-service-1', 'fake-module-2');
+    const logger2 = new Logger({ serviceName: 'fake-service-1', moduleName: 'fake-module-2' });
 
-    const logger3 = new Logger('fake-service-3', 'fake-module-2');
+    const logger3 = new Logger({ serviceName: 'fake-service-3', moduleName: 'fake-module-2' });
 
     expect(logger1).not.toBe(logger2);
     expect(logger1).not.toBe(logger3);
     expect(logger2).not.toBe(logger3);
+  });
+
+  test('should create a logger with presets', () => {
+    const logger1 = new Logger({
+      serviceName: 'fake-service-1',
+      moduleName: 'fake-module-1',
+      presets: { trackId: 'fake-track-id' },
+    });
+    expect(typeof logger1).toBe('object');
   });
 });

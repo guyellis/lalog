@@ -11,8 +11,6 @@ addons:
     packages:
     - gcc-4.8
     - g++-4.8
-services:
-  - mongodb
 before_install:
 - npm install -g npm
 - npm install -g greenkeeper-lockfile@1

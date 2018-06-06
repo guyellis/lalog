@@ -93,11 +93,22 @@ describe('/lib/logger', () => {
   });
 
   test('should create a logger with presets', () => {
-    const logger1 = new Logger({
+    const testLogger = new Logger({
       serviceName: 'fake-service-1',
       moduleName: 'fake-module-1',
-      presets: { trackId: 'fake-track-id' },
+      presets: { testProp: 'fake-track-id' },
     });
-    expect(typeof logger1).toBe('object');
+    expect(typeof testLogger).toBe('object');
+    expect(testLogger.presets.testProp).toBe('fake-track-id');
+  });
+
+  test('should create a presets trackId with addTrackId option', () => {
+    const testLogger = new Logger({
+      serviceName: 'fake-service-1',
+      moduleName: 'fake-module-1',
+      addTrackId: true,
+    });
+    expect(typeof testLogger).toBe('object');
+    expect(testLogger.presets.trackId).toHaveLength(36);
   });
 });

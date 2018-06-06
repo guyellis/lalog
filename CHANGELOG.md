@@ -1,5 +1,10 @@
 # Changelog
 
+### 0.3.0
+
+- Add `addTrackId` boolean option to `create()` parameter to create a `trackId` in the presets if truthy.
+- Improve Readme
+
 ### 0.2.0
 
 - Breaking: `Logger` constructor and `.create()` now take a single `options` object

@@ -1,5 +1,10 @@
 # Changelog
 
+### 0.4.0
+
+- Use `LALOG_LEVEL` environment variable as the initial log level if it is set and
+is valid.
+
 ### 0.3.0
 
 - Add `addTrackId` boolean option to `create()` parameter to create a `trackId` in the presets if truthy.

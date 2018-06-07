@@ -14,11 +14,11 @@ npm i lalog --save
 
 ### Setup
 
-If logging to Loggly then this environment variable needs to be set:
+If logging to Loggly then your Loggly token needs to be set in the `LOGGLY_TOKEN` 
+environment variable.
 
-```javascript
-process.env.LOGGLY_TOKEN
-```
+If you want to specify a different initial logging level for your application than
+the default `error` levels you can set the `LALOG_LEVEL` environment variable.
 
 ### Create a Logger
 

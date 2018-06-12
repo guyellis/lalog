@@ -39,6 +39,13 @@ describe('/lib/logger', () => {
     expect(actual).toEqual(expected);
   });
 
+  test('should create all log level methods with .create()', () => {
+    const localLogger = Logger.create('mock-service', 'mock-module');
+    ['trace', 'info', 'warn', 'error', 'fatal', 'security'].forEach((level) => {
+      expect(typeof localLogger[level]).toBe('function');
+    });
+  });
+
   test('should get/set Levels', () => {
     let previousLevel = Logger.getLevel();
     expect(previousLevel).toBe('error');

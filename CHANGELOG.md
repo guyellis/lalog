@@ -1,5 +1,9 @@
 # Changelog
 
+### ?.?.?
+
+- Improve error handling by refactoring more code into try...catch block
+
 ### 0.4.0
 
 - Use `LALOG_LEVEL` environment variable as the initial log level if it is set and

@@ -157,9 +157,9 @@ describe('/lib/loggly-wrapper', () => {
         } = body;
 
         expect(level).toBe('info');
-        const durationTextStart = 'Missing label "my-time-label-missing" in timeEnd()\n' +
-          'Error\n' +
-          '    at Logger.writeTimeEnd';
+        const durationTextStart = 'Missing label "my-time-label-missing" in timeEnd()\n'
+          + 'Error\n'
+          + '    at Logger.writeTimeEnd';
         expect(duration.startsWith(durationTextStart)).toBe(true);
         expect(timerLabel).toBe('my-time-label-missing');
 

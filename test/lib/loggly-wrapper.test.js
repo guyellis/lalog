@@ -14,7 +14,7 @@ const logger = Logger.create({
   moduleName: 'test-logger',
 });
 
-// Assign console to an object to check calls to console and supress
+// Assign console to an object to check calls to console and suppress
 // console to stdout
 global.console = {};
 

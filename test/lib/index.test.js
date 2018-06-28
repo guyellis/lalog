@@ -57,6 +57,37 @@ describe('/lib/logger', () => {
     expect(previousLevel).toBe('warn');
   });
 
+  test('should timeEnd() and preserve original msg', () => {
+    logger.time('time-label');
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        logger.timeEnd('time-label', {
+          msg: 'fake-msg', // will be appended to 'Timer - '
+          other: 'data', // will be preserved as is
+          duration: 'I will be lost', // because this clashes with the duration it will be lost
+        });
+        expect(loggerWrite).toHaveBeenCalledTimes(1);
+
+        const [lastCallParam1, lastCallParam2] = loggerWrite.mock.calls[0];
+        expect(lastCallParam1).toBe(1);
+
+        const {
+          msg, other, timerLabel, duration,
+        } = lastCallParam2;
+        expect(msg).toBe('Timer - fake-msg');
+        expect(other).toBe('data');
+        expect(timerLabel).toBe('time-label');
+
+        // Duration is a timestamp that will look something like this: "00:00:01.002"
+        const durationParts = duration.split(':');
+        const seconds = parseInt(durationParts[2], 10);
+        expect(seconds).toBe(1);
+
+        return resolve(true);
+      }, 1000);
+    });
+  });
+
   test('should parse request object', () => {
     const object = {
       body: 1,

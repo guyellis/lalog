@@ -9,7 +9,7 @@
       "request": "launch",
       "program": "${workspaceRoot}/node_modules/.bin/jest",
       "args": [
-        "${workspaceRoot}/test/lib/loggly-wrapper.test.js", // replace this file with the file to focus
+        "${workspaceRoot}/test/lib/index.test.js", // replace this file with the file to focus
         "-i",
         "--forceExit"
       ],

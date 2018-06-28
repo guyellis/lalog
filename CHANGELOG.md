@@ -1,8 +1,9 @@
 # Changelog
 
-### ?.?.?
+### 0.4.1
 
 - Improve error handling by refactoring more code into try...catch block
+- Bug: Append original `msg` in `timeEnd()`
 
 ### 0.4.0
 

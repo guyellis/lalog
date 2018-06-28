@@ -22,6 +22,8 @@ describe('/lib/loggly-wrapper', () => {
   beforeAll(() => {
     // Set log level to "error" before tests start running
     Logger.setLevel('error');
+    // NODE_ENV is used in the Logger constructor to generate the tag
+    process.env.NODE_ENV = 'development';
   });
   beforeEach(() => {
     global.console.error = jest.fn();

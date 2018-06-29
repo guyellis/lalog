@@ -7,7 +7,7 @@
     "debug": "3.1.0",
     "lodash": "4.17.10",
     "node-fetch": "2.1.2",
-    "uuid": "3.3.0"
+    "uuid": "3.3.2"
   },
   "description": "Logging aggregation and distribution",
   "devDependencies": {

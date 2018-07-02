@@ -327,7 +327,14 @@ describe('/lib/loggly-wrapper', () => {
     expect(result).toEqual({});
     expect(fetch).toHaveBeenCalledTimes(1);
     expect(console.error).toHaveBeenCalledTimes(1);
-    expect(console.error).toHaveBeenLastCalledWith('fetch() call failed with 500');
+
+    // Make sure that console.log includes the call stack so we can trace
+    // back to where the problem originated
+    const [firstCallParams] = console.error.mock.calls;
+    const [firstParam] = firstCallParams;
+    expect(firstParam.startsWith('fetch() call failed with 500')).toBe(true);
+    expect(firstParam.includes('\nError')).toBe(true);
+    expect(firstParam.includes('lib/loggly-wrapper.js')).toBe(true);
   });
 
   test('should not call fetch() if LOGGLY_TOKEN has not been defined', async () => {

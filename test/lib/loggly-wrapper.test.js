@@ -7,6 +7,7 @@ const fetch = require('node-fetch');
 jest.mock('node-fetch');
 
 const Logger = require('../../lib');
+const { logSingle, logBatch } = require('../../lib/loggly-wrapper');
 
 const logger = Logger.create({
   serviceName: 'test-service',
@@ -370,6 +371,16 @@ describe('/lib/loggly-wrapper', () => {
     expect(fetch.mock.calls[0][0]).toBe('https://logs-01.loggly.com/bulk/test-loggly-token/tag/fake-service-1-development/');
 
     Logger.setLevel(previousLevel);
+  });
+
+  test('should console.error if log param is not an object in logSingle', async () => {
+    await logSingle(true);
+    expect(console.error).toHaveBeenCalledTimes(1);
+  });
+
+  test('should console.error if log param is not an array in logBatch', async () => {
+    await logBatch(true);
+    expect(console.error).toHaveBeenCalledTimes(1);
   });
 });
 

@@ -1,6 +1,5 @@
 /* eslint-disable no-console */
 
-process.env.LOGGLY_TOKEN = 'test-loggly-token';
 process.env.LOGGLY_SUBDOMAIN = 'test-loggly-subdomain';
 
 const fetch = require('node-fetch');
@@ -26,6 +25,7 @@ describe('/lib/loggly-wrapper', () => {
   beforeEach(() => {
     global.console.error = jest.fn();
     global.console.warn = jest.fn();
+    process.env.LOGGLY_TOKEN = 'test-loggly-token';
     fetch.mockReset();
   });
   afterEach(() => {
@@ -344,6 +344,32 @@ describe('/lib/loggly-wrapper', () => {
     expect(fetch).not.toHaveBeenCalled();
     expect(console.warn).toHaveBeenCalledTimes(1);
     expect(console.warn).toHaveBeenLastCalledWith('loggly token has not been defined');
+  });
+
+  test('should create a transient logger', async () => {
+    let previousLevel = Logger.getLevel();
+    previousLevel = Logger.setLevel('error');
+
+    const testLogger = new Logger({
+      serviceName: 'fake-service-1',
+      moduleName: 'fake-module-1',
+      isTransient: true,
+    });
+
+    await testLogger.trace({});
+    expect(fetch).not.toHaveBeenCalled();
+
+    await testLogger.info({});
+    expect(fetch).not.toHaveBeenCalled();
+
+    await testLogger.warn({});
+    expect(fetch).not.toHaveBeenCalled();
+
+    await testLogger.error({});
+    expect(fetch).toHaveBeenCalled();
+    expect(fetch.mock.calls[0][0]).toBe('https://logs-01.loggly.com/bulk/test-loggly-token/tag/fake-service-1-development/');
+
+    Logger.setLevel(previousLevel);
   });
 });
 

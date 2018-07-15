@@ -62,8 +62,9 @@ or
 const logger = new Logger({
   serviceName: 'service-name',
   moduleName: 'module-name',
-  presets: {}, // optional
-  addTrackId: true, // options
+  presets: {}, // optional - defaults to empty object if missing or not a valid object
+  addTrackId: true, // optional - defaults to false
+  isTransient: true, // optional - defaults to false
 });
 ```
 
@@ -75,6 +76,22 @@ which can be used for debugging.
 - `presets` is an optional object that will have its contents merged with any object that's logged. Useful for putting in data that you want logged with every message.
 - If `addTrackId` is truthy then a `trackId` (uuid) will be added to `presets`.
 - The `moduleName` is added to `presets` as `module`.
+- If `isTransient` is set to true then all calls to logger will be saved and written in batch mode, in
+sequence, to the destination if any of the log calls triggers a write. This flag is called `isTransient`
+because typically you will only use it for short lived transient loggers. The typical use case is when
+you attach a logger to the `req`/`request` object in a web request. You would then probably call the
+logger with trace, info and warn calls that would not be written if you level is set to `error`. If
+`error()` is called you also would want all the previous logs to be written so that you can see what
+happened before the `error()` was called. The `isTransient` flag causes the logger to store all of 
+those logs and write then in this scenario.
+  - More notes on `isTransient`
+  - You would almost always want to also set `trackId` to `true` when you set `isTransient` to `true`
+  so that you can easily find/filter the associated log messages.
+  - You don't want to use this for long lived loggers as they may accumulate too many logs (local
+  memory issues) and if the log messages are too big then they may error when writing to the
+  desintation.
+  - Possible future feature is to provide a maximum number of log messages to accumulate if `isTransient`
+  is set.
 
 ### Write Log Messages
 

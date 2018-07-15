@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.6.0
+
+- Add transient logging feature.
+
 ### 0.5.0
 
 - Add a call stack to console.error() if Loggly returns a non-200 error.

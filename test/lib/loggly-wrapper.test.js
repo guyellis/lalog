@@ -1,7 +1,5 @@
 /* eslint-disable no-console */
 
-process.env.LOGGLY_SUBDOMAIN = 'test-loggly-subdomain';
-
 const fetch = require('node-fetch');
 
 jest.mock('node-fetch');

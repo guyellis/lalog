@@ -80,8 +80,8 @@ which can be used for debugging.
 sequence, to the destination if any of the log calls triggers a write. This flag is called `isTransient`
 because typically you will only use it for short lived transient loggers. The typical use case is when
 you attach a logger to the `req`/`request` object in a web request. You would then probably call the
-logger with trace, info and warn calls that would not be written if you level is set to `error`. If
-`error()` is called you also would want all the previous logs to be written so that you can see what
+logger with trace, info and warn calls that would not be written if your level is set to `error`. If
+`error()` is called you would also want all the previous logs to be written so that you can see what
 happened before the `error()` was called. The `isTransient` flag causes the logger to store all of 
 those logs and write then in this scenario.
   - More notes on `isTransient`
@@ -89,9 +89,9 @@ those logs and write then in this scenario.
   so that you can easily find/filter the associated log messages.
   - You don't want to use this for long lived loggers as they may accumulate too many logs (local
   memory issues) and if the log messages are too big then they may error when writing to the
-  desintation.
-  - Possible future feature is to provide a maximum number of log messages to accumulate if `isTransient`
-  is set.
+  destination.
+  - Possible future feature is to provide a maximum number of log messages to
+  accumulate if `isTransient` is set.
 
 ### Write Log Messages
 

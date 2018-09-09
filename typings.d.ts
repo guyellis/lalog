@@ -26,15 +26,21 @@ declare namespace lalog {
         isTransient?: boolean;
     }
 
-    export interface Logger {
-        constructor(val: LogOptions): Logger;
-        time: (label: string) => void;
-        timeEnd: (label: string) => void;
+    interface LoggerMethods {
         trace: (logObj: object) => Promise<undefined>;
         info: (logObj: object) => Promise<undefined>;
         warn: (logObj: object) => Promise<undefined>;
         error: (logObj: object) => Promise<undefined>;
         fatal: (logObj: object) => Promise<undefined>;
         security: (logObj: object) => Promise<undefined>;
+    }
+
+    interface LoggerTimeEnd extends LoggerMethods {
+        (label: string, extraLogData?: object): Promise<undefined>;
+    }
+
+    export interface Logger extends LoggerMethods {
+        time: (label: string) => void;
+        timeEnd: LoggerTimeEnd;
     }
 }

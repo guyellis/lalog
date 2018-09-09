@@ -38,8 +38,7 @@
   "pre-commit": {
     "colors": true,
     "run": [
-      "lint",
-      "coverage"
+      "test"
     ],
     "silent": false
   },
@@ -52,7 +51,7 @@
     "coverage-view": "google-chrome coverage/lcov-report/index.html",
     "lint": "eslint --ext .js .",
     "lintfix": "eslint --ext .js . --fix",
-    "test": "npm run lint && npm run coverage"
+    "test": "npm run lint && npm run coverage && tsc"
   },
   "version": "0.6.0"
 }

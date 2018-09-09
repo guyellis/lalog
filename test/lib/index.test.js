@@ -40,7 +40,10 @@ describe('/lib/logger', () => {
   });
 
   test('should create all log level methods with .create()', () => {
-    const localLogger = Logger.create('mock-service', 'mock-module');
+    const localLogger = Logger.create({
+      serviceName: 'mock-service',
+      moduleName: 'mock-module',
+    });
     ['trace', 'info', 'warn', 'error', 'fatal', 'security'].forEach((level) => {
       expect(typeof localLogger[level]).toBe('function');
     });

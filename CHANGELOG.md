@@ -3,6 +3,7 @@
 ### 0.6.0
 
 - Add transient logging feature.
+- Add typings
 
 ### 0.5.0
 

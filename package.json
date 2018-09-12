@@ -53,5 +53,5 @@
     "lintfix": "eslint --ext .js . --fix",
     "test": "npm run lint && npm run coverage && tsc"
   },
-  "version": "0.6.0"
+  "version": "0.6.1"
 }

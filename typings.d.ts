@@ -1,11 +1,35 @@
-// Type definitions for lalog 0.7.0
+// Type definitions for lalog 0.6.1
 // Project: https://github.com/guyellis/lalog
 // Definitions by: Guy Ellis <https://github.com/guyellis>
-// Definitions: https://github.com/guyellis/lalog/typings.d.ts
 
-export = lalog;
+/*~ This declaration specifies that the class constructor function
+ *~ is the exported object from the file
+ */
+export = LaLog;
 
-declare namespace lalog {
+/*~ Write your module's methods and properties in this class */
+declare class LaLog {
+    constructor(options: LaLog.LogOptions);
+
+    // Static methods
+    create: (options: LaLog.LogOptions) => LaLog;
+    setLevel: (level: LaLog.LevelEnum) => LaLog.LevelEnum;
+    getLevel: () => LaLog.LevelEnum;
+    allLevels: () => Array<LaLog.LevelEnum>;
+
+    // Instance methods
+    time: (label: string) => void;
+    // TODO: timeEnd has all the log methods on it.
+    timeEnd: (label: string, extraLogData?: object) => Promise<undefined>;
+    trace: (logObj: object) => Promise<undefined>;
+    info: (logObj: object) => Promise<undefined>;
+    warn: (logObj: object) => Promise<undefined>;
+    error: (logObj: object) => Promise<undefined>;
+    fatal: (logObj: object) => Promise<undefined>;
+    security: (logObj: object) => Promise<undefined>;
+}
+
+declare namespace LaLog {
     type LevelEnum =
       'trace'|
       'info'|
@@ -15,32 +39,14 @@ declare namespace lalog {
       'security';
 
     export interface LogPresets {
-    //   trackId?: string;
       [key: string]: string;
     }
+    
     export interface LogOptions {
         addTrackId?: boolean;
         moduleName?: string;
         presets?: LogPresets;
         serviceName?: string;
         isTransient?: boolean;
-    }
-
-    interface LoggerMethods {
-        trace: (logObj: object) => Promise<undefined>;
-        info: (logObj: object) => Promise<undefined>;
-        warn: (logObj: object) => Promise<undefined>;
-        error: (logObj: object) => Promise<undefined>;
-        fatal: (logObj: object) => Promise<undefined>;
-        security: (logObj: object) => Promise<undefined>;
-    }
-
-    interface LoggerTimeEnd extends LoggerMethods {
-        (label: string, extraLogData?: object): Promise<undefined>;
-    }
-
-    export interface Logger extends LoggerMethods {
-        time: (label: string) => void;
-        timeEnd: LoggerTimeEnd;
     }
 }

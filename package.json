@@ -4,7 +4,7 @@
     "url": "https://github.com/guyellis/lalog/issues"
   },
   "dependencies": {
-    "debug": "4.0.1",
+    "debug": "4.1.0",
     "lodash": "4.17.11",
     "node-fetch": "2.2.0",
     "uuid": "3.3.2"

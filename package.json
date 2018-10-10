@@ -12,7 +12,7 @@
   "description": "Logging aggregation and distribution",
   "devDependencies": {
     "@types/debug": "0.0.31",
-    "@types/lodash": "4.14.116",
+    "@types/lodash": "4.14.117",
     "@types/node-fetch": "2.1.2",
     "@types/uuid": "3.4.4",
     "eslint": "4.19.1",

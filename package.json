@@ -11,7 +11,7 @@
   },
   "description": "Logging aggregation and distribution",
   "devDependencies": {
-    "@types/debug": "4.1.2",
+    "@types/debug": "4.1.3",
     "@types/lodash": "4.14.122",
     "@types/node-fetch": "2.1.7",
     "@types/uuid": "3.4.4",

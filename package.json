@@ -13,7 +13,7 @@
   "devDependencies": {
     "@types/debug": "4.1.4",
     "@types/lodash": "4.14.129",
-    "@types/node-fetch": "2.3.3",
+    "@types/node-fetch": "2.3.4",
     "@types/uuid": "3.4.4",
     "eslint": "5.16.0",
     "eslint-config-airbnb-base": "13.0.0",

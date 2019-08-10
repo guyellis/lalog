@@ -16,7 +16,7 @@
     "@types/node-fetch": "2.5.0",
     "@types/uuid": "3.4.5",
     "eslint": "5.16.0",
-    "eslint-config-airbnb-base": "13.0.0",
+    "eslint-config-airbnb-base": "14.0.0",
     "eslint-plugin-import": "2.18.2",
     "eslint-plugin-jest": "22.15.0",
     "eslint-plugin-security": "1.4.0",

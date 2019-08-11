@@ -22,7 +22,7 @@
     "eslint-plugin-security": "1.4.0",
     "jest": "23.2.0",
     "pre-commit": "1.2.2",
-    "typescript": "3.0.3"
+    "typescript": "3.5.3"
   },
   "engines": {
     "node": ">=10",

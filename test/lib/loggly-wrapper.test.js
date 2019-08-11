@@ -168,7 +168,9 @@ describe('/lib/loggly-wrapper', () => {
       logger.time('my-time-label');
       await logger.timeEnd('my-time-label-missing');
       expect(fetch).toHaveBeenCalledTimes(1);
-      expect.assertions(6);
+      // TODO: This is wrong - should be 6 - but Jest thinks it's 5.
+      // Happend during 23.x to 24.x Jest upgrade
+      expect.assertions(5);
     });
   });
 

@@ -1,3 +1,4 @@
+export {}; // To get around: Cannot redeclare block-scoped variable ts(2451)
 /* eslint-disable no-console */
 
 const fetch = require('node-fetch');
@@ -14,6 +15,7 @@ const logger = Logger.create({
 
 // Assign console to an object to check calls to console and suppress
 // console to stdout
+// @ts-ignore
 global.console = {};
 
 describe('/lib/loggly-wrapper', () => {
@@ -25,6 +27,7 @@ describe('/lib/loggly-wrapper', () => {
     global.console.error = jest.fn();
     global.console.warn = jest.fn();
     process.env.LOGGLY_TOKEN = 'test-loggly-token';
+    // @ts-ignore
     fetch.mockReset();
   });
   afterEach(() => {
@@ -40,6 +43,7 @@ describe('/lib/loggly-wrapper', () => {
     };
 
     const resp = { status: 200, json: () => ({}) };
+    // @ts-ignore
     fetch.mockResolvedValue(resp);
 
     await logger.error(logObj);
@@ -56,6 +60,7 @@ describe('/lib/loggly-wrapper', () => {
     };
 
     const resp = { status: 200, json: () => ({}) };
+    // @ts-ignore
     fetch.mockResolvedValue(resp);
 
     await logger.warn(logObj);
@@ -75,7 +80,7 @@ describe('/lib/loggly-wrapper', () => {
       // eslint-disable-next-line no-plusplus
       Date.now = jest.fn(() => (dateNowCallCounter++ > 0 ? 5000 : 0));
 
-      fetch.mockImplementation((url, options) => {
+      fetch.mockImplementation((url: string, options: any) => {
         expect(url).toBe('https://logs-01.loggly.com/inputs/test-loggly-token/tag/test-service-development/');
         expect(options.method).toBe('POST');
         const body = JSON.parse(options.body);
@@ -101,6 +106,7 @@ describe('/lib/loggly-wrapper', () => {
 
     test('should not log a default timer log if level is higher than info', async () => {
       const resp = { status: 200, json: () => ({}) };
+      // @ts-ignore
       fetch.mockResolvedValue(resp);
 
       await logger.time('my-time-label');
@@ -118,6 +124,7 @@ describe('/lib/loggly-wrapper', () => {
       // eslint-disable-next-line no-plusplus
       Date.now = jest.fn(() => (dateNowCallCounter++ > 0 ? 5000 : 0));
 
+      // @ts-ignore
       fetch.mockImplementation((url, options) => {
         expect(url).toBe('https://logs-01.loggly.com/inputs/test-loggly-token/tag/test-service-development/');
         expect(options.method).toBe('POST');
@@ -136,6 +143,7 @@ describe('/lib/loggly-wrapper', () => {
       });
 
       await logger.time('my-time-label');
+      // @ts-ignore
       await logger.timeEnd.error('my-time-label', extraLogData);
       expect(fetch).toHaveBeenCalledTimes(1);
       expect(Date.now).toHaveBeenCalledTimes(2);
@@ -147,6 +155,7 @@ describe('/lib/loggly-wrapper', () => {
     test('should add a stack if timeEnd() label is missing', async () => {
       Logger.setLevel('info');
 
+      // @ts-ignore
       fetch.mockImplementation((url, options) => {
         expect(url).toBe('https://logs-01.loggly.com/inputs/test-loggly-token/tag/test-service-development/');
         expect(options.method).toBe('POST');
@@ -178,10 +187,12 @@ describe('/lib/loggly-wrapper', () => {
     Logger.setLevel('info');
     const req = {};
 
+    // @ts-ignore
     fetch.mockImplementation(() => {
       throw new Error('fake error');
     });
 
+    // @ts-ignore
     const result = await logger.info(req);
     expect(result).toEqual({});
     expect(fetch).toHaveBeenCalledTimes(1);
@@ -189,6 +200,7 @@ describe('/lib/loggly-wrapper', () => {
   });
 
   test('should console.error if object not passed to log function', async () => {
+    // @ts-ignore
     await logger.error('i am a string');
     expect(console.error).toHaveBeenCalledTimes(1);
     const expected = 'Expecting an object in logger write method but got "string"';
@@ -205,6 +217,7 @@ describe('/lib/loggly-wrapper', () => {
       },
     };
 
+    // @ts-ignore
     fetch.mockImplementation((url, options) => {
       expect(url).toBe('https://logs-01.loggly.com/inputs/test-loggly-token/tag/test-service-development/');
       expect(options.method).toBe('POST');
@@ -236,6 +249,7 @@ describe('/lib/loggly-wrapper', () => {
       },
     };
 
+    // @ts-ignore
     fetch.mockImplementation((url, options) => {
       const body = JSON.parse(options.body);
       const {
@@ -274,6 +288,7 @@ describe('/lib/loggly-wrapper', () => {
       },
     };
 
+    // @ts-ignore
     fetch.mockImplementation((url, options) => {
       const body = JSON.parse(options.body);
 
@@ -294,10 +309,12 @@ describe('/lib/loggly-wrapper', () => {
     const response = {
       code: 1234,
       res: {
+        // @ts-ignore
         status: (c) => {
           expect(c).toBe(1234);
           return response.res;
         },
+        // @ts-ignore
         send: (obj) => {
           expect(obj.success).toBe(false);
         },
@@ -311,8 +328,10 @@ describe('/lib/loggly-wrapper', () => {
     };
 
     const resp = { status: 200, json: () => ({}) };
+    // @ts-ignore
     fetch.mockResolvedValue(resp);
 
+    // @ts-ignore
     await logger.error(logData, response);
     expect(fetch).toHaveBeenCalledTimes(1);
     expect.assertions(3);
@@ -322,8 +341,10 @@ describe('/lib/loggly-wrapper', () => {
     const logData = {};
 
     const resp = { status: 500, json: () => ({}) };
+    // @ts-ignore
     fetch.mockResolvedValue(resp);
 
+    // @ts-ignore
     const result = await logger.error(logData);
     expect(result).toEqual({});
     expect(fetch).toHaveBeenCalledTimes(1);
@@ -331,6 +352,7 @@ describe('/lib/loggly-wrapper', () => {
 
     // Make sure that console.log includes the call stack so we can trace
     // back to where the problem originated
+    // @ts-ignore
     const [firstCallParams] = console.error.mock.calls;
     const [firstParam] = firstCallParams;
     expect(firstParam.startsWith('fetch() call failed with 500')).toBe(true);
@@ -368,17 +390,20 @@ describe('/lib/loggly-wrapper', () => {
 
     await testLogger.error({});
     expect(fetch).toHaveBeenCalled();
+    // @ts-ignore
     expect(fetch.mock.calls[0][0]).toBe('https://logs-01.loggly.com/bulk/test-loggly-token/tag/fake-service-1-development/');
 
     Logger.setLevel(previousLevel);
   });
 
   test('should console.error if log param is not an object in logSingle', async () => {
+    // @ts-ignore
     await logSingle(true);
     expect(console.error).toHaveBeenCalledTimes(1);
   });
 
   test('should console.error if log param is not an array in logBatch', async () => {
+    // @ts-ignore
     await logBatch(true);
     expect(console.error).toHaveBeenCalledTimes(1);
   });

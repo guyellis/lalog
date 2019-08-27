@@ -1,7 +1,8 @@
+export {}; // To get around: Cannot redeclare block-scoped variable ts(2451)
 const Logger = require('../../lib');
 
 let loggerWrite = jest.fn();
-Logger.prototype.write = (levelIndex, logObject) => {
+Logger.prototype.write = (levelIndex: number, logObject: any) => {
   loggerWrite(levelIndex, logObject);
 };
 

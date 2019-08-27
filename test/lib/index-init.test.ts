@@ -1,3 +1,5 @@
+export {}; // To get around: Cannot redeclare block-scoped variable ts(2451)
+
 describe('/lib/logger-init', () => {
   test('should set initial level if LALOG_LEVEL is set and valid', () => {
     process.env.LALOG_LEVEL = 'trace';

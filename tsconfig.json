@@ -8,13 +8,13 @@
     "noEmit": true,
     "resolveJsonModule": true,
     "strict": true,
-    "target": "es5"
+    "target": "ES2017"
   },
   "include": [
-    "lib/**/*"
+    "lib/**/*",
+    "test/**/*"
   ],
   "exclude": [
-    "node_modules",
-    "**/*.spec.ts"
+    "node_modules"
   ]
 }

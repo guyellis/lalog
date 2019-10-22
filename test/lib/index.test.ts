@@ -1,4 +1,4 @@
-import Logger from '../../lib';
+import Logger, { LevelEnum } from '../../lib';
 
 let loggerWrite = jest.fn();
 Logger.prototype.write = (levelIndex: number, logObject: any): Promise<any> => {

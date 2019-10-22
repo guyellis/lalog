@@ -2,18 +2,20 @@
   "compilerOptions": {
     "allowJs": false,
     "checkJs": false,
+    "declaration": true,
     "esModuleInterop": true,
-    "lib": ["es2016"],
+    "incremental": true,
+    "lib": ["es2019"],
     "module": "commonjs",
     "noEmit": false,
     "outDir": "dist",
     "resolveJsonModule": false,
+    "sourceMap": true,
     "strict": true,
-    "target": "ES2017"
+    "target": "es2017"
   },
   "include": [
-    "lib/**/*",
-    "test/**/*"
+    "lib/**/*"
   ],
   "exclude": [
     "node_modules"

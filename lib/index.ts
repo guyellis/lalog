@@ -20,8 +20,6 @@ const getInitialLogLevel = (): number => {
 
 let currentLevelIndex = getInitialLogLevel();
 
-type LogWriteFn = (levelIndex: number, logData: any, response?: any) => Promise<any>;
-
 export default class Logger {
   isTransient: boolean;
 
@@ -169,12 +167,7 @@ export default class Logger {
   }
 
   /**
-   * [Private] Write the timer label end
-   * @param {number} levelIndex
-   * @param {string} label
-   * @param {object} [extraLogData={}]
-   * @returns {Promise}
-   * @memberof Logger
+   * Write the timer label end
    */
   writeTimeEnd(levelIndex: number, label: string, extraLogDat?: any): Promise<any> {
     const extraLogData = extraLogDat || {};
@@ -197,11 +190,6 @@ export default class Logger {
 
   /**
    * Write log to destination
-   * @param {number} levelIndex
-   * @param {object} logData
-   * @param {object=} response
-   * @returns {Promise}
-   * @memberof Logger
    */
   async write(levelIndex: number, logData: any, response?: any): Promise<any> {
     if (!isObject(logData)) {
@@ -253,7 +241,6 @@ export default class Logger {
         logObj.fullStack = logObj.err.stack.split('\n').slice(1);
         /**
          * Checks if string includes node_modules
-         * @param {string} i
          */
         const hasNodeModules = (i: string): boolean => !i.includes('/node_modules/');
         logObj.shortStack = logObj.fullStack.filter(hasNodeModules);

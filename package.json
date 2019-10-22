@@ -38,7 +38,7 @@
     "logging"
   ],
   "license": "MIT",
-  "main": "lib/index.js",
+  "main": "dist/index.js",
   "name": "lalog",
   "pre-commit": {
     "colors": true,
@@ -47,6 +47,7 @@
     ],
     "silent": false
   },
+  "pre-publish": "tsc",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/guyellis/lalog.git"
@@ -58,5 +59,6 @@
     "lintfix": "eslint --ext .js . --fix",
     "test": "npm run lint && npm run coverage && tsc --incremental"
   },
+  "types": "dist/index.d.ts",
   "version": "0.7.0"
 }

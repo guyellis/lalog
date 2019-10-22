@@ -17,7 +17,9 @@ type LevelEnum =
   'security';
 
 interface LogPresets {
-  [key: string]: string;
+  [key: string]: string | undefined;
+  module?: string;
+  trackId?: string;
 }
 
 interface LaLogOptions {
@@ -28,14 +30,17 @@ interface LaLogOptions {
   isTransient?: boolean;
 }
 
+type LogFunction = (logData: any, response?: any) => Promise<any>;
+type TimeLogFunction = (label: string, extraLogDat?: any) => Promise<any>;
+
 interface TimeEndLog {
   (label: string, extraLogDat?: any): Promise<any>;
-  trace?: (label: string, extraLogDat?: any) => Promise<any>;
-  info?: (label: string, extraLogDat?: any) => Promise<any>;
-  warn?: (label: string, extraLogDat?: any) => Promise<any>;
-  error?: (label: string, extraLogDat?: any) => Promise<any>;
-  fatal?: (label: string, extraLogDat?: any) => Promise<any>;
-  security?: (label: string, extraLogDat?: any) => Promise<any>;
+  trace?: TimeLogFunction;
+  info?: TimeLogFunction;
+  warn?: TimeLogFunction;
+  error?: TimeLogFunction;
+  fatal?: TimeLogFunction;
+  security?: TimeLogFunction;
 }
 
 interface LaLog{
@@ -78,7 +83,7 @@ export default class Logger {
 
   logCollector: any[] | null;
 
-  presets: any;
+  presets: LogPresets;
 
   debug: debug.Debugger;
 
@@ -86,19 +91,19 @@ export default class Logger {
 
   timeEnd: TimeEndLog;
 
-  trace: Function;
+  trace: LogFunction;
 
-  info: Function;
+  info: LogFunction;
 
-  warn: Function;
+  warn: LogFunction;
 
-  error: Function;
+  error: LogFunction;
 
-  fatal: Function;
+  fatal: LogFunction;
 
-  security: Function;
+  security: LogFunction;
 
-  time: Function;
+  time: (label: string) => void;
 
   timers: Record<string, number>;
 

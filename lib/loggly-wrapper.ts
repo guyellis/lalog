@@ -1,33 +1,24 @@
-const _ = require('lodash');
-const fetch = require('node-fetch');
+import _ from 'lodash';
+import fetch, { RequestInit, Response } from 'node-fetch';
 
-/**
- * Write log to Loggly
- * @param {object} options
- * @param {string} options.tag
- * @param {string=} options.logglyToken
- * @param {string} options.logObj
- * @param {boolean} bulk
- */
-const log = async (options, bulk) => {
+interface LogOptions {
+  tag: string;
+  logglyToken?: string;
+  logObj: string;
+}
+
+const log = async (options: LogOptions, bulk: boolean): Promise<object> => {
   const {
     tag,
     logglyToken = process.env.LOGGLY_TOKEN,
     logObj: body,
   } = options;
 
-
   const pathPart = bulk ? 'bulk' : 'inputs';
 
   if (logglyToken) {
-    /**
-     * @type {string}
-     */
     let url = '';
-    /**
-     * @type {import('node-fetch').RequestInit}
-     */
-    let fetchOptions = {};
+    let fetchOptions: RequestInit = {};
     try {
       url = `https://logs-01.loggly.com/${pathPart}/${logglyToken}/tag/${tag}/`;
       fetchOptions = {
@@ -39,13 +30,7 @@ const log = async (options, bulk) => {
         body,
       };
 
-      /**
-       * @type {import('node-fetch').Response}
-       */
-      // @ts-ignore Cannot invoke an expression whose type lacks a call signature...
-      // ts-ignore seems to be needed because of a bug in the node-fetch typing file.
-      // Try and remove the ignore if this typing file is updated
-      const result = await fetch(url, fetchOptions);
+      const result: Response = await fetch(url, fetchOptions);
 
       if (result.status !== 200) {
         const { stack } = new Error();
@@ -69,14 +54,13 @@ options: ${JSON.stringify(fetchOptions, null, 2)}`);
   return {};
 };
 
-/**
- * Log a single log object
- * @param {object} options
- * @param {string} options.tag
- * @param {string=} options.logglyToken
- * @param {object} options.logObj
- */
-const logSingle = (options) => {
+export interface LogSingleOptions {
+  tag: string;
+  logglyToken?: string;
+  logObj: any;
+}
+
+export const logSingle = (options: LogSingleOptions): object => {
   const { logObj } = options;
   if (!_.isObject(logObj)) {
     // eslint-disable-next-line no-console
@@ -91,14 +75,13 @@ const logSingle = (options) => {
   }, false);
 };
 
-/**
- * Log an array of logs
- * @param {object} options
- * @param {string} options.tag
- * @param {string=} options.logglyToken
- * @param {Array<object>} options.logObj
- */
-const logBatch = async (options) => {
+export interface LogBatchOptions {
+  tag: string;
+  logglyToken?: string;
+  logObj: any[];
+}
+
+export const logBatch = async (options: LogBatchOptions): Promise<object|void> => {
   const { logObj } = options;
   if (!_.isArray(logObj)) {
     // eslint-disable-next-line no-console
@@ -111,9 +94,4 @@ const logBatch = async (options) => {
     ...options,
     logObj: body,
   }, true);
-};
-
-module.exports = {
-  logBatch,
-  logSingle,
 };

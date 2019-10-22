@@ -1,10 +1,9 @@
-export {}; // To get around: Cannot redeclare block-scoped variable ts(2451)
+process.env.LALOG_LEVEL = 'trace';
+// eslint-disable-next-line import/first
+import Logger from '../../lib';
 
 describe('/lib/logger-init', () => {
   test('should set initial level if LALOG_LEVEL is set and valid', () => {
-    process.env.LALOG_LEVEL = 'trace';
-    // eslint-disable-next-line global-require
-    const Logger = require('../../lib');
     const level = Logger.getLevel();
     expect(level).toBe('trace');
   });

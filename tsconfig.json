@@ -1,12 +1,13 @@
 {
   "compilerOptions": {
-    "allowJs": true,
-    "checkJs": true,
+    "allowJs": false,
+    "checkJs": false,
     "esModuleInterop": true,
     "lib": ["es2016"],
     "module": "commonjs",
-    "noEmit": true,
-    "resolveJsonModule": true,
+    "noEmit": false,
+    "outDir": "dist",
+    "resolveJsonModule": false,
     "strict": true,
     "target": "ES2017"
   },

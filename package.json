@@ -16,6 +16,8 @@
     "@types/lodash": "4.14.144",
     "@types/node-fetch": "2.5.2",
     "@types/uuid": "3.4.5",
+    "@typescript-eslint/eslint-plugin": "2.5.0",
+    "@typescript-eslint/parser": "2.5.0",
     "eslint": "6.5.1",
     "eslint-config-airbnb-base": "14.0.0",
     "eslint-plugin-import": "2.18.2",
@@ -56,5 +58,5 @@
     "lintfix": "eslint --ext .js . --fix",
     "test": "npm run lint && npm run coverage && tsc --incremental"
   },
-  "version": "0.6.1"
+  "version": "0.7.0"
 }

@@ -1,9 +1,9 @@
-export {}; // To get around: Cannot redeclare block-scoped variable ts(2451)
-const Logger = require('../../lib');
+import Logger from '../../lib';
 
 let loggerWrite = jest.fn();
-Logger.prototype.write = (levelIndex: number, logObject: any) => {
+Logger.prototype.write = (levelIndex: number, logObject: any): Promise<any> => {
   loggerWrite(levelIndex, logObject);
+  return Promise.resolve();
 };
 
 const logger = Logger.create({
@@ -45,9 +45,12 @@ describe('/lib/logger', () => {
       serviceName: 'mock-service',
       moduleName: 'mock-module',
     });
-    ['trace', 'info', 'warn', 'error', 'fatal', 'security'].forEach((level) => {
-      expect(typeof localLogger[level]).toBe('function');
-    });
+    expect(typeof localLogger.trace).toBe('function');
+    expect(typeof localLogger.info).toBe('function');
+    expect(typeof localLogger.warn).toBe('function');
+    expect(typeof localLogger.error).toBe('function');
+    expect(typeof localLogger.fatal).toBe('function');
+    expect(typeof localLogger.security).toBe('function');
   });
 
   test('should get/set Levels', () => {
@@ -56,7 +59,8 @@ describe('/lib/logger', () => {
     previousLevel = Logger.setLevel('warn');
     // returns previous level because set succeeded
     expect(previousLevel).toBe('error');
-    previousLevel = Logger.setLevel('this is rubbish');
+    const invalidValue = 'this is rubbish' as LevelEnum;
+    previousLevel = Logger.setLevel(invalidValue);
     // returns current level because set failed
     expect(previousLevel).toBe('warn');
   });

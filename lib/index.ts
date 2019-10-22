@@ -1,23 +1,18 @@
-const isObject = require('lodash/isObject');
-const debug = require('debug');
-const uuid = require('uuid');
+import isObject from 'lodash/isObject';
+import debug from 'debug';
+import uuid from 'uuid';
 
-const {
+import {
   logBatch,
   logSingle,
-} = require('./loggly-wrapper');
+} from './loggly-wrapper';
 
-/**
- * @type {Array<import('../typings').LevelEnum>}
- */
-const levels = ['trace', 'info', 'warn', 'error', 'fatal', 'security'];
+const levels: LevelEnum[] = ['trace', 'info', 'warn', 'error', 'fatal', 'security'];
 const errorLevel = levels.indexOf('error');
 
-const getInitialLogLevel = () => {
-  /** @type {import('../typings').LevelEnum} */
-  // @ts-ignore Type 'string' is not assignable to type 'LevelEnum'
-  const laLogLevel = process.env.LALOG_LEVEL;
-  if (levels.includes(laLogLevel)) {
+const getInitialLogLevel = (): number => {
+  const laLogLevel = process.env.LALOG_LEVEL as LevelEnum;
+  if (levels.includes(laLogLevel || '')) {
     return levels.indexOf(laLogLevel);
   }
   return levels.indexOf('error');
@@ -25,15 +20,40 @@ const getInitialLogLevel = () => {
 
 let currentLevelIndex = getInitialLogLevel();
 
-/**
- * @type {import('../typings')}
- */
-class Logger {
-  /**
-   * Create an instance of Logger
-   * @param {import('../typings').LogOptions} options
-   */
-  constructor(options) {
+type LogWriteFn = (levelIndex: number, logData: any, response?: any) => Promise<any>;
+
+export default class Logger {
+  isTransient: boolean;
+
+  logCollector: any[] | null;
+
+  presets: any;
+
+  debug: debug.Debugger;
+
+  tag: string;
+
+  timeEnd: TimeEndLog;
+
+  trace: Function;
+
+  info: Function;
+
+  warn: Function;
+
+  error: Function;
+
+  fatal: Function;
+
+  security: Function;
+
+  time: Function;
+
+  timers: Record<string, number>;
+
+  isTransientTriggered?: boolean;
+
+  constructor(options: LaLogOptions) {
     const {
       addTrackId,
       moduleName,
@@ -44,9 +64,6 @@ class Logger {
 
     this.isTransient = !!isTransient;
 
-    /**
-     * @type {Array|null}
-     */
     this.logCollector = isTransient ? [] : null;
 
     this.presets = {
@@ -54,9 +71,7 @@ class Logger {
       ...(isObject(presets) ? presets : {}),
     };
 
-    // @ts-ignore
     if (addTrackId && !this.presets.trackId) {
-    // @ts-ignore
       this.presets.trackId = uuid.v4();
     }
 
@@ -66,6 +81,7 @@ class Logger {
     // Setup timeEnd so that it can be called without a level and when that happens the
     // level will default to info:
     const defaultTimeEndLevel = levels.indexOf('info');
+
     this.timeEnd = this.writeTimeEnd.bind(this, defaultTimeEndLevel);
 
     // Listed like this so that Typescript can type each log level.
@@ -77,71 +93,48 @@ class Logger {
     this.fatal = this.write.bind(this, levels.indexOf('fatal'));
     this.security = this.write.bind(this, levels.indexOf('security'));
 
-    // @ts-ignore
     this.timeEnd.trace = this.writeTimeEnd.bind(this, levels.indexOf('trace'));
-    // @ts-ignore
     this.timeEnd.info = this.writeTimeEnd.bind(this, levels.indexOf('info'));
-    // @ts-ignore
     this.timeEnd.warn = this.writeTimeEnd.bind(this, levels.indexOf('warn'));
-    // @ts-ignore
     this.timeEnd.error = this.writeTimeEnd.bind(this, levels.indexOf('error'));
-    // @ts-ignore
     this.timeEnd.fatal = this.writeTimeEnd.bind(this, levels.indexOf('fatal'));
-    // @ts-ignore
     this.timeEnd.security = this.writeTimeEnd.bind(this, levels.indexOf('security'));
 
     this.timers = {};
     /**
      * Start a timer log - same as console.time()
-     * @param {string} label - label to use when calling timeEnd()
+     * @param label - label to use when calling timeEnd()
      */
-    this.time = (label) => {
-    // @ts-ignore
+    this.time = (label: string): void => {
       this.timers[label] = Date.now();
     };
   }
 
   /**
     * Create an instance of Logger
-    * @static
-    * @param {import('../typings').LogOptions} options
-    * @returns {import('../typings')}
-    * @memberof Logger
     */
-  static create(options) {
-    // @ts-ignore Type 'Logger' is not assignable to type 'LaLog'.
-    // Property 'create' is missing in type 'Logger'.
+  static create(options: LaLogOptions): Logger {
     return new Logger(options);
   }
 
   /**
    * Get an array of all available log levels
-   * @static
-   * @returns {Array<import('../typings').LevelEnum>}
-   * @memberof Logger
    */
-  static allLevels() {
+  static allLevels(): LevelEnum[] {
     return levels;
   }
 
   /**
    * Get the current log level
-   * @static
-   * @returns {import('../typings').LevelEnum}
-   * @memberof Logger
    */
-  static getLevel() {
+  static getLevel(): LevelEnum {
     return levels[currentLevelIndex];
   }
 
   /**
    * Change the minimum level to write logs
-   * @static
-   * @param {import('../typings').LevelEnum} newLevelName
-   * @returns {import('../typings').LevelEnum}
-   * @memberof Logger
    */
-  static setLevel(newLevelName) {
+  static setLevel(newLevelName: LevelEnum): LevelEnum {
     const previousLevel = Logger.getLevel();
     const newLevelIndex = levels.indexOf(newLevelName);
     if (newLevelIndex >= 0) {
@@ -152,12 +145,8 @@ class Logger {
 
   /**
    * Parse the Express request (req) object for logging
-   * @static
-   * @param {Object} req
-   * @returns {Object}
-   * @memberof Logger
    */
-  static parseReq(req) {
+  static parseReq(req: any): object {
     return {
       body: req.body,
       headers: req.headers,
@@ -172,12 +161,8 @@ class Logger {
 
   /**
    * Format milliseconds to a string for logging
-   * @static
-   * @param {number} milliseconds
-   * @returns {string}
-   * @memberof Logger
    */
-  static formatMilliseconds(milliseconds) {
+  static formatMilliseconds(milliseconds: number): string {
     const date = new Date(0);
     date.setMilliseconds(milliseconds);
     return date.toISOString().substr(11, 12);
@@ -191,8 +176,8 @@ class Logger {
    * @returns {Promise}
    * @memberof Logger
    */
-  writeTimeEnd(levelIndex, label, extraLogData = {}) {
-    // @ts-ignore
+  writeTimeEnd(levelIndex: number, label: string, extraLogDat?: any): Promise<any> {
+    const extraLogData = extraLogDat || {};
     const time = this.timers[label];
     const duration = Object.prototype.hasOwnProperty.call(this.timers, label)
       ? Logger.formatMilliseconds(Date.now() - time)
@@ -218,17 +203,14 @@ class Logger {
    * @returns {Promise}
    * @memberof Logger
    */
-  async write(levelIndex, logData, response) {
+  async write(levelIndex: number, logData: any, response?: any): Promise<any> {
     if (!isObject(logData)) {
       // eslint-disable-next-line no-console
       console.error(`Expecting an object in logger write method but got "${typeof logData}"`);
       return Promise.resolve();
     }
 
-    /**
-     * @type {object}
-     */
-    const logObj = { ...this.presets, ...logData };
+    const logObj: any = { ...this.presets, ...logData };
 
     if (response) {
       // If the response object has been included with the call then it means we need to
@@ -273,7 +255,7 @@ class Logger {
          * Checks if string includes node_modules
          * @param {string} i
          */
-        const hasNodeModules = (i) => !i.includes('/node_modules/');
+        const hasNodeModules = (i: string): boolean => !i.includes('/node_modules/');
         logObj.shortStack = logObj.fullStack.filter(hasNodeModules);
         if (!logObj.msg) {
           logObj.msg = logObj.err.message;
@@ -301,5 +283,3 @@ class Logger {
     return Promise.resolve();
   }
 }
-
-module.exports = Logger;

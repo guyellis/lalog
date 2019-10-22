@@ -8,7 +8,7 @@ import {
 } from './loggly-wrapper';
 
 
-type LevelEnum =
+export type LevelEnum =
   'trace'|
   'info'|
   'warn'|

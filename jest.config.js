@@ -1,6 +1,8 @@
+const collectCoverage = !process.env.SKIP_COVERAGE;
+
 /** @type {jest.InitialOptions} */
 module.exports = {
-  verbose: false,
+  collectCoverage,
   collectCoverageFrom: [
     '!**/.vscode/**',
     '!**/coverage/**',
@@ -39,4 +41,5 @@ module.exports = {
   transform: {
     '.+\\.[j|t]sx?$': 'ts-jest',
   },
+  verbose: false,
 };

@@ -1,5 +1,5 @@
-import isObject from 'lodash/isObject';
 import uuid from 'uuid';
+import { isObject } from './utils';
 
 import {
   logBatch,

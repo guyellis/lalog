@@ -21,11 +21,12 @@ module.exports = {
   "rules": {
     'import/no-unresolved': [0],
     "@typescript-eslint/no-explicit-any": [0],
+    "import/prefer-default-export": [0],
     "jest/no-disabled-tests": [2],
     "jest/no-focused-tests": [2],
     "jest/no-identical-title": [2],
     "jest/prefer-to-have-length": [2],
     "jest/valid-expect": [2],
-    "security/detect-object-injection": [0]
+    "security/detect-object-injection": [0],
   }
 };

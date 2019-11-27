@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import fetch, { RequestInit, Response } from 'node-fetch';
+import { isObject } from './utils';
 
 interface LogOptions {
   tag: string;
@@ -62,7 +63,7 @@ export interface LogSingleOptions {
 
 export const logSingle = (options: LogSingleOptions): object => {
   const { logObj } = options;
-  if (!_.isObject(logObj)) {
+  if (!isObject(logObj)) {
     // eslint-disable-next-line no-console
     console.error(`Expected an Object in logSingle but got ${typeof logObj}`);
     return Promise.resolve();

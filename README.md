@@ -70,9 +70,6 @@ const logger = new Logger({
 
 Notes on create:
 
-- `lalog` uses `debug` as one of its destinations. The `serviceName` and `moduleName` props allow
-you to filter `debug` messages. A `debug` name of the form `serviceName:moduleName` will be created
-which can be used for debugging.
 - `presets` is an optional object that will have its contents merged with any object that's logged. Useful for putting in data that you want logged with every message.
 - If `addTrackId` is truthy then a `trackId` (uuid) will be added to `presets`.
 - The `moduleName` is added to `presets` as `module`.

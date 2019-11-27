@@ -1,12 +1,10 @@
 import isObject from 'lodash/isObject';
-import debug from 'debug';
 import uuid from 'uuid';
 
 import {
   logBatch,
   logSingle,
 } from './loggly-wrapper';
-
 
 export type LevelEnum =
   'trace'|
@@ -16,13 +14,13 @@ export type LevelEnum =
   'fatal'|
   'security';
 
-interface LogPresets {
+export interface LogPresets {
   [key: string]: string | undefined;
   module?: string;
   trackId?: string;
 }
 
-interface LaLogOptions {
+export interface LaLogOptions {
   addTrackId?: boolean;
   moduleName?: string;
   presets?: LogPresets;
@@ -30,8 +28,8 @@ interface LaLogOptions {
   isTransient?: boolean;
 }
 
-type LogFunction = (logData: any, response?: any) => Promise<any>;
-type TimeLogFunction = (label: string, extraLogDat?: any) => Promise<any>;
+export type LogFunction = (logData: any, response?: any) => Promise<any>;
+export type TimeLogFunction = (label: string, extraLogDat?: any) => Promise<any>;
 
 interface TimeEndLog {
   (label: string, extraLogDat?: any): Promise<any>;
@@ -85,8 +83,6 @@ export default class Logger {
 
   presets: LogPresets;
 
-  debug: debug.Debugger;
-
   tag: string;
 
   timeEnd: TimeEndLog;
@@ -131,7 +127,6 @@ export default class Logger {
       this.presets.trackId = uuid.v4();
     }
 
-    this.debug = debug(`${serviceName}:${moduleName}`);
     this.tag = `${serviceName}-${process.env.NODE_ENV}`;
 
     // Setup timeEnd so that it can be called without a level and when that happens the
@@ -321,7 +316,6 @@ export default class Logger {
           this.logCollector = null; // Can GC right away now that this array is no longer needed
         }
       } else {
-        this.debug(logObj);
         return logSingle({ tag: this.tag, logObj });
       }
     }

@@ -1,0 +1,6 @@
+# https://docs.npmjs.com/misc/developers#keeping-files-out-of-your-package
+# Use "npm pack" to test this file.
+
+.vscode/
+coverage/
+test/

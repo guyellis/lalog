@@ -1,5 +1,13 @@
 # Changelog
 
+### 0.8.0
+
+- Breaking: LevelEnum renamed to LevelType
+- Breaking: timeEnd() no longer has level log methods on it.
+- Breaking: timeEnd() now has 3 params - inserted  a 2nd param
+
+### 0.7.0
+
 ### 0.6.0
 
 - Add transient logging feature.

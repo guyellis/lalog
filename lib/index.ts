@@ -7,7 +7,7 @@ import {
 } from './loggly-wrapper';
 
 const levels = ['trace', 'info', 'warn', 'error', 'fatal', 'security'] as const;
-type LevelEnum = typeof levels[number];
+export type LevelType = typeof levels[number];
 
 export interface LogPresets {
   [key: string]: string | undefined;
@@ -41,9 +41,9 @@ interface TimeEndLog {
 
 //   // Static methods
 //   create: (options: LaLogOptions) => LaLog;
-//   setLevel: (level: LevelEnum) => LevelEnum;
-//   getLevel: () => LevelEnum;
-//   allLevels: () => Array<LevelEnum>;
+//   setLevel: (level: LevelType) => LevelType;
+//   getLevel: () => LevelType;
+//   allLevels: () => Array<LevelType>;
 
 //   // Instance methods
 //   time: (label: string) => void;
@@ -60,7 +60,7 @@ interface TimeEndLog {
 const errorLevel = levels.indexOf('error');
 
 const getInitialLogLevel = (): number => {
-  const laLogLevel = process.env.LALOG_LEVEL as LevelEnum;
+  const laLogLevel = process.env.LALOG_LEVEL as LevelType;
   if (levels.includes(laLogLevel || '')) {
     return levels.indexOf(laLogLevel);
   }
@@ -164,21 +164,21 @@ export default class Logger {
   /**
    * Get an array of all available log levels
    */
-  static allLevels(): ReadonlyArray<LevelEnum> {
+  static allLevels(): ReadonlyArray<LevelType> {
     return levels;
   }
 
   /**
    * Get the current log level
    */
-  static getLevel(): LevelEnum {
+  static getLevel(): LevelType {
     return levels[currentLevelIndex];
   }
 
   /**
    * Change the minimum level to write logs
    */
-  static setLevel(newLevelName: LevelEnum): LevelEnum {
+  static setLevel(newLevelName: LevelType): LevelType {
     const previousLevel = Logger.getLevel();
     const newLevelIndex = levels.indexOf(newLevelName);
     if (newLevelIndex >= 0) {

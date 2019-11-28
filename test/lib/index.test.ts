@@ -1,4 +1,4 @@
-import Logger, { LevelEnum } from '../../lib';
+import Logger, { LevelType } from '../../lib';
 
 let loggerWrite = jest.fn();
 Logger.prototype.write = (levelIndex: number, logObject: any): Promise<any> => {
@@ -59,7 +59,7 @@ describe('/lib/logger', () => {
     previousLevel = Logger.setLevel('warn');
     // returns previous level because set succeeded
     expect(previousLevel).toBe('error');
-    const invalidValue = 'this is rubbish' as LevelEnum;
+    const invalidValue = 'this is rubbish' as LevelType;
     previousLevel = Logger.setLevel(invalidValue);
     // returns current level because set failed
     expect(previousLevel).toBe('warn');

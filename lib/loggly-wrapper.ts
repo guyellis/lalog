@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import fetch, { RequestInit, Response } from 'node-fetch';
 import { isObject } from './utils';
 
@@ -84,7 +83,7 @@ export interface LogBatchOptions {
 
 export const logBatch = async (options: LogBatchOptions): Promise<object|void> => {
   const { logObj } = options;
-  if (!_.isArray(logObj)) {
+  if (!Array.isArray(logObj)) {
     // eslint-disable-next-line no-console
     console.error(`Expected an Array in logBatch but got ${typeof logObj}`);
     return Promise.resolve();

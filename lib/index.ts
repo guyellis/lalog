@@ -6,13 +6,8 @@ import {
   logSingle,
 } from './loggly-wrapper';
 
-export type LevelEnum =
-  'trace'|
-  'info'|
-  'warn'|
-  'error'|
-  'fatal'|
-  'security';
+const levels = ['trace', 'info', 'warn', 'error', 'fatal', 'security'] as const;
+type LevelEnum = typeof levels[number];
 
 export interface LogPresets {
   [key: string]: string | undefined;
@@ -62,8 +57,6 @@ interface TimeEndLog {
 //   security: (logObj: object) => Promise<undefined>;
 // }
 
-
-const levels: LevelEnum[] = ['trace', 'info', 'warn', 'error', 'fatal', 'security'];
 const errorLevel = levels.indexOf('error');
 
 const getInitialLogLevel = (): number => {
@@ -171,7 +164,7 @@ export default class Logger {
   /**
    * Get an array of all available log levels
    */
-  static allLevels(): LevelEnum[] {
+  static allLevels(): ReadonlyArray<LevelEnum> {
     return levels;
   }
 

@@ -69,7 +69,7 @@ describe('/lib/logger', () => {
     logger.time('time-label');
     return new Promise((resolve) => {
       setTimeout(() => {
-        logger.timeEnd('time-label', {
+        logger.timeEnd('time-label', 'info', {
           msg: 'fake-msg', // will be appended to 'Timer - '
           other: 'data', // will be preserved as is
           duration: 'I will be lost', // because this clashes with the duration it will be lost

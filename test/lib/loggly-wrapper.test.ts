@@ -98,7 +98,7 @@ describe('/lib/loggly-wrapper', () => {
       });
 
       await logger.time('my-time-label');
-      await logger.timeEnd('my-time-label', extraLogData);
+      await logger.timeEnd('my-time-label', 'info', extraLogData);
       expect(fetch).toHaveBeenCalledTimes(1);
       expect(Date.now).toHaveBeenCalledTimes(2);
       expect.assertions(5);
@@ -143,10 +143,7 @@ describe('/lib/loggly-wrapper', () => {
       });
 
       await logger.time('my-time-label');
-      if (!logger.timeEnd.error) {
-        throw new Error('logger.timeEnd.error not defined');
-      }
-      await logger.timeEnd.error('my-time-label', extraLogData);
+      await logger.timeEnd('my-time-label', 'error', extraLogData);
       expect(fetch).toHaveBeenCalledTimes(1);
       expect(Date.now).toHaveBeenCalledTimes(2);
       expect.assertions(11);

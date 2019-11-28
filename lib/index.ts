@@ -24,38 +24,7 @@ export interface LaLogOptions {
 }
 
 export type LogFunction = (logData: any, response?: any) => Promise<any>;
-export type TimeLogFunction = (label: string, extraLogDat?: any) => Promise<any>;
-
-interface TimeEndLog {
-  (label: string, extraLogDat?: any): Promise<any>;
-  trace?: TimeLogFunction;
-  info?: TimeLogFunction;
-  warn?: TimeLogFunction;
-  error?: TimeLogFunction;
-  fatal?: TimeLogFunction;
-  security?: TimeLogFunction;
-}
-
-// interface LaLog {
-//   new(options: LaLogOptions): void;
-
-//   // Static methods
-//   create: (options: LaLogOptions) => LaLog;
-//   setLevel: (level: LevelType) => LevelType;
-//   getLevel: () => LevelType;
-//   allLevels: () => Array<LevelType>;
-
-//   // Instance methods
-//   time: (label: string) => void;
-//   // TODO: timeEnd has all the log methods on it.
-//   timeEnd: (label: string, extraLogData?: object) => Promise<undefined>;
-//   trace: (logObj: object) => Promise<undefined>;
-//   info: (logObj: object) => Promise<undefined>;
-//   warn: (logObj: object) => Promise<undefined>;
-//   error: (logObj: object) => Promise<undefined>;
-//   fatal: (logObj: object) => Promise<undefined>;
-//   security: (logObj: object) => Promise<undefined>;
-// }
+export type TimeLogFunction = (label: string, level?: LevelType, extraLogDat?: any) => Promise<any>;
 
 const errorLevel = levels.indexOf('error');
 
@@ -78,7 +47,7 @@ export default class Logger {
 
   tag: string;
 
-  timeEnd: TimeEndLog;
+  timeEnd: TimeLogFunction;
 
   trace: LogFunction;
 
@@ -122,11 +91,7 @@ export default class Logger {
 
     this.tag = `${serviceName}-${process.env.NODE_ENV}`;
 
-    // Setup timeEnd so that it can be called without a level and when that happens the
-    // level will default to info:
-    const defaultTimeEndLevel = levels.indexOf('info');
-
-    this.timeEnd = this.writeTimeEnd.bind(this, defaultTimeEndLevel);
+    this.timeEnd = this.writeTimeEnd.bind(this);
 
     // Listed like this so that Typescript can type each log level.
     // Previously this was setup using a loop but Typescript couldn't type it
@@ -136,13 +101,6 @@ export default class Logger {
     this.error = this.write.bind(this, levels.indexOf('error'));
     this.fatal = this.write.bind(this, levels.indexOf('fatal'));
     this.security = this.write.bind(this, levels.indexOf('security'));
-
-    this.timeEnd.trace = this.writeTimeEnd.bind(this, levels.indexOf('trace'));
-    this.timeEnd.info = this.writeTimeEnd.bind(this, levels.indexOf('info'));
-    this.timeEnd.warn = this.writeTimeEnd.bind(this, levels.indexOf('warn'));
-    this.timeEnd.error = this.writeTimeEnd.bind(this, levels.indexOf('error'));
-    this.timeEnd.fatal = this.writeTimeEnd.bind(this, levels.indexOf('fatal'));
-    this.timeEnd.security = this.writeTimeEnd.bind(this, levels.indexOf('security'));
 
     this.timers = {};
     /**
@@ -215,7 +173,8 @@ export default class Logger {
   /**
    * Write the timer label end
    */
-  writeTimeEnd(levelIndex: number, label: string, extraLogDat?: any): Promise<any> {
+  writeTimeEnd(label: string, level?: LevelType, extraLogDat?: any): Promise<any> {
+    const levelIndex = levels.indexOf(level ?? 'info');
     const extraLogData = extraLogDat || {};
     const time = this.timers[label];
     const duration = Object.prototype.hasOwnProperty.call(this.timers, label)

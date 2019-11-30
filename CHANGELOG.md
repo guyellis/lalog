@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.8.1
+
+- Fix: Allow undefined to be passed to setLevel()
+
 ### 0.8.0
 
 - Breaking: LevelEnum renamed to LevelType

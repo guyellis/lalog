@@ -53,6 +53,11 @@ describe('/lib/loggly-wrapper', () => {
     expect(fetch).toHaveBeenCalledTimes(1);
   });
 
+  test('should call setLevel without a param', () => {
+    const existingLevel = Logger.setLevel();
+    expect(existingLevel).toBe('error');
+  });
+
   test('should log a warning log and not create an Error', async () => {
     Logger.setLevel('warn');
 

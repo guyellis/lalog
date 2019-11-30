@@ -134,10 +134,15 @@ export default class Logger {
   }
 
   /**
-   * Change the minimum level to write logs
+   * Change the minimum level to write logs.
+   * @param newLevelName - If falsy it will just return the current level
+   * @returns The previous level
    */
-  static setLevel(newLevelName: LevelType): LevelType {
+  static setLevel(newLevelName?: LevelType): LevelType {
     const previousLevel = Logger.getLevel();
+    if (!newLevelName) {
+      return previousLevel;
+    }
     const newLevelIndex = levels.indexOf(newLevelName);
     if (newLevelIndex >= 0) {
       currentLevelIndex = newLevelIndex;

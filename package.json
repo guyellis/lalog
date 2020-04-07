@@ -52,8 +52,8 @@
   "scripts": {
     "coverage": "jest --coverage",
     "coverage-view": "google-chrome coverage/lcov-report/index.html",
-    "lint": "eslint --ext .js .",
-    "lintfix": "eslint --ext .js . --fix",
+    "lint": "eslint --ext .js --ext .jsx --ext .ts --ext .tsx . --max-warnings 0",
+    "lintfix": "eslint --ext .js --ext .jsx --ext .ts --ext .tsx . --fix",
     "test": "npm run lint && npm run coverage && tsc"
   },
   "types": "dist/index.d.ts",

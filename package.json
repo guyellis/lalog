@@ -20,7 +20,7 @@
     "eslint-plugin-import": "2.20.2",
     "eslint-plugin-jest": "23.8.2",
     "eslint-plugin-security": "1.4.0",
-    "jest": "25.5.3",
+    "jest": "25.5.4",
     "jest-circus": "25.5.3",
     "pre-commit": "1.2.2",
     "ts-jest": "25.4.0",

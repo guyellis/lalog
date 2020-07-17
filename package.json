@@ -24,7 +24,7 @@
     "jest-circus": "26.1.0",
     "pre-commit": "1.2.2",
     "ts-jest": "25.5.1",
-    "typescript": "3.9.6"
+    "typescript": "3.9.7"
   },
   "engines": {
     "node": ">=10",

@@ -235,7 +235,6 @@ export default class Logger {
     // - If isTransientTriggered
     //   - log everything
 
-
     if (levelIndex >= currentLevelIndex || this.isTransient) {
       logObj.level = levels[levelIndex];
 

@@ -31,7 +31,6 @@ describe('/lib/loggly-wrapper', () => {
     global.console.warn = consoleWarn;
     process.env.LOGGLY_TOKEN = 'test-loggly-token';
 
-
     fetchMock.mockReset();
   });
   afterEach(() => {

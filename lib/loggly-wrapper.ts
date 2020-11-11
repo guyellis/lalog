@@ -1,5 +1,5 @@
 import fetch, { RequestInit, Response } from 'node-fetch';
-import { isObject } from './utils';
+import { isObject, safeJsonStringify } from './utils';
 
 interface LogOptions {
   tag: string;
@@ -44,7 +44,7 @@ const log = async (options: LogOptions, bulk: boolean): Promise<object> => {
       // eslint-disable-next-line no-console
       console.error(`fetch() threw an error: ${err.message}
 url: ${url}
-options: ${JSON.stringify(fetchOptions, null, 2)}`);
+options: ${safeJsonStringify(fetchOptions)}`);
       return {};
     }
   }
@@ -68,7 +68,7 @@ export const logSingle = (options: LogSingleOptions): object => {
     return Promise.resolve();
   }
 
-  const body = JSON.stringify(logObj);
+  const body = safeJsonStringify(logObj);
   return log({
     ...options,
     logObj: body,
@@ -89,7 +89,7 @@ export const logBatch = async (options: LogBatchOptions): Promise<object|void> =
     return Promise.resolve();
   }
 
-  const body = logObj.map((a) => JSON.stringify(a)).join('\n');
+  const body = logObj.map(safeJsonStringify).join('\n');
   return log({
     ...options,
     logObj: body,

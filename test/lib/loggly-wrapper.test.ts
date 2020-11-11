@@ -101,7 +101,7 @@ describe('/lib/loggly-wrapper', () => {
         return { status: 200, json: (): object => ({}) };
       });
 
-      await logger.time('my-time-label');
+      logger.time('my-time-label');
       await logger.timeEnd('my-time-label', 'info', extraLogData);
       expect(fetch).toHaveBeenCalledTimes(1);
       expect(Date.now).toHaveBeenCalledTimes(2);
@@ -114,7 +114,7 @@ describe('/lib/loggly-wrapper', () => {
       const resp = { status: 200, json: (): object => ({}) };
       fetchMock.mockResolvedValue(resp);
 
-      await logger.time('my-time-label');
+      logger.time('my-time-label');
       await logger.timeEnd('my-time-label');
       expect(fetch).not.toHaveBeenCalled();
     });
@@ -146,7 +146,7 @@ describe('/lib/loggly-wrapper', () => {
         return { status: 200, json: (): object => ({}) };
       });
 
-      await logger.time('my-time-label');
+      logger.time('my-time-label');
       await logger.timeEnd('my-time-label', 'error', extraLogData);
       expect(fetch).toHaveBeenCalledTimes(1);
       expect(Date.now).toHaveBeenCalledTimes(2);

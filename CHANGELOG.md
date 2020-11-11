@@ -1,5 +1,13 @@
 # Changelog
 
+### 0.8.3 (2020-11-11)
+
+- Fix: Fix Circular references in objects for JSON.stringify
+
+### 0.8.2 (2020-11-11)
+
+- Update dependencies
+
 ### 0.8.1
 
 - Fix: Allow undefined to be passed to setLevel()

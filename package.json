@@ -9,7 +9,7 @@
   },
   "description": "Logging aggregation and distribution",
   "devDependencies": {
-    "@types/jest": "26.0.15",
+    "@types/jest": "26.0.16",
     "@types/node": "14.14.10",
     "@types/node-fetch": "2.5.7",
     "@types/uuid": "8.3.0",

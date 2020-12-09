@@ -5,7 +5,7 @@
   },
   "dependencies": {
     "node-fetch": "2.6.1",
-    "uuid": "8.3.1"
+    "uuid": "8.3.2"
   },
   "description": "Logging aggregation and distribution",
   "devDependencies": {

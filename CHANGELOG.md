@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.8.4 (2021-01-24)
+
+- Update dependencies
+
 ### 0.8.3 (2020-11-11)
 
 - Fix: Fix Circular references in objects for JSON.stringify

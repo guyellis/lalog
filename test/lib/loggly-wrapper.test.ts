@@ -7,8 +7,8 @@ import {
 jest.mock('node-fetch');
 
 const logger = Logger.create({
-  serviceName: 'test-service',
   moduleName: 'test-logger',
+  serviceName: 'test-service',
 });
 
 // Assign console to an object to check calls to console and suppress
@@ -45,7 +45,7 @@ describe('/lib/loggly-wrapper', () => {
       user: 'some user',
     };
 
-    const resp = { status: 200, json: (): object => ({}) };
+    const resp = { json: (): object => ({}), status: 200 };
     fetchMock.mockResolvedValue(resp);
 
     await logger.error(logObj);
@@ -66,7 +66,7 @@ describe('/lib/loggly-wrapper', () => {
       user: 'some user',
     };
 
-    const resp = { status: 200, json: (): object => ({}) };
+    const resp = { json: (): object => ({}), status: 200 };
     fetchMock.mockResolvedValue(resp);
 
     await logger.warn(logObj);
@@ -94,11 +94,11 @@ describe('/lib/loggly-wrapper', () => {
           duration: '00:00:05.000',
           fake: 'fake-extra-data',
           level: 'info',
+          module: 'test-logger',
           msg: 'Timer',
           timerLabel: 'my-time-label',
-          module: 'test-logger',
         });
-        return { status: 200, json: (): object => ({}) };
+        return { json: (): object => ({}), status: 200 };
       });
 
       logger.time('my-time-label');
@@ -111,7 +111,7 @@ describe('/lib/loggly-wrapper', () => {
     });
 
     test('should not log a default timer log if level is higher than info', async () => {
-      const resp = { status: 200, json: (): object => ({}) };
+      const resp = { json: (): object => ({}), status: 200 };
       fetchMock.mockResolvedValue(resp);
 
       logger.time('my-time-label');
@@ -143,7 +143,7 @@ describe('/lib/loggly-wrapper', () => {
         expect(timerLabel).toBe('my-time-label');
         expect(shortStack).toBeTruthy();
         expect(fullStack).toBeTruthy();
-        return { status: 200, json: (): object => ({}) };
+        return { json: (): object => ({}), status: 200 };
       });
 
       logger.time('my-time-label');
@@ -173,7 +173,7 @@ describe('/lib/loggly-wrapper', () => {
         expect(duration.startsWith(durationTextStart)).toBe(true);
         expect(timerLabel).toBe('my-time-label-missing');
 
-        return { status: 200, json: (): object => ({}) };
+        return { json: (): object => ({}), status: 200 };
       });
 
       logger.time('my-time-label');
@@ -208,12 +208,12 @@ describe('/lib/loggly-wrapper', () => {
 
   test('should add a stack if it is missing from err', async () => {
     const req = {
-      ip: '1.2.3.4',
-      path: 'some path',
-      user: 'some user',
       err: {
         message: 'Will be used for missing msg',
       },
+      ip: '1.2.3.4',
+      path: 'some path',
+      user: 'some user',
     };
 
     fetchMock.mockImplementation((url, options) => {
@@ -228,7 +228,7 @@ describe('/lib/loggly-wrapper', () => {
       expect(shortStack).toBeTruthy();
       expect(msg).toBe('Will be used for missing msg');
 
-      return { status: 200, json: (): object => ({}) };
+      return { json: (): object => ({}), status: 200 };
     });
 
     await logger.error(req);
@@ -238,13 +238,13 @@ describe('/lib/loggly-wrapper', () => {
 
   test('should use object message if present', async () => {
     const req = {
-      ip: '1.2.3.4',
-      path: 'some path',
-      user: 'some user',
-      msg: 'root message',
       err: {
         message: 'error message',
       },
+      ip: '1.2.3.4',
+      msg: 'root message',
+      path: 'some path',
+      user: 'some user',
     };
 
     fetchMock.mockImplementation((url, options) => {
@@ -257,7 +257,7 @@ describe('/lib/loggly-wrapper', () => {
       expect(shortStack).toBeTruthy();
       expect(msg).toBe('root message');
 
-      return { status: 200, json: (): object => ({}) };
+      return { json: (): object => ({}), status: 200 };
     });
 
     await logger.error(req);
@@ -279,9 +279,9 @@ describe('/lib/loggly-wrapper', () => {
         params: 'params',
         path: 'path',
         query: 'query',
+        random: 'random',
         url: 'url',
         user: 'user',
-        random: 'random',
       },
     };
 
@@ -293,7 +293,7 @@ describe('/lib/loggly-wrapper', () => {
       expect(req.url).toBe('url');
       expect(req.random).toBeFalsy();
 
-      return { status: 200, json: (): object => ({}) };
+      return { json: (): object => ({}), status: 200 };
     });
 
     await logger.error(logObj);
@@ -305,12 +305,12 @@ describe('/lib/loggly-wrapper', () => {
     const response = {
       code: 1234,
       res: {
+        send: (obj: any): void => {
+          expect(obj.success).toBe(false);
+        },
         status: (c: number): any => {
           expect(c).toBe(1234);
           return response.res;
-        },
-        send: (obj: any): void => {
-          expect(obj.success).toBe(false);
         },
       },
     };
@@ -321,7 +321,7 @@ describe('/lib/loggly-wrapper', () => {
       user: 'some user',
     };
 
-    const resp = { status: 200, json: (): object => ({}) };
+    const resp = { json: (): object => ({}), status: 200 };
     fetchMock.mockResolvedValue(resp);
 
     await logger.error(logData, response);
@@ -332,7 +332,7 @@ describe('/lib/loggly-wrapper', () => {
   test('should console.error() a non-200 status from Loggly', async () => {
     const logData = {};
 
-    const resp = { status: 500, json: (): object => ({}) };
+    const resp = { json: (): object => ({}), status: 500 };
     fetchMock.mockResolvedValue(resp);
 
     const result = await logger.error(logData);
@@ -363,9 +363,9 @@ describe('/lib/loggly-wrapper', () => {
     previousLevel = Logger.setLevel('error');
 
     const testLogger = new Logger({
-      serviceName: 'fake-service-1',
-      moduleName: 'fake-module-1',
       isTransient: true,
+      moduleName: 'fake-module-1',
+      serviceName: 'fake-service-1',
     });
 
     await testLogger.trace({});

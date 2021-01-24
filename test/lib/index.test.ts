@@ -7,8 +7,8 @@ Logger.prototype.write = (levelIndex: number, logObject: any): Promise<any> => {
 };
 
 const logger = Logger.create({
-  serviceName: 'test-service',
   moduleName: 'test-logger',
+  serviceName: 'test-service',
 });
 
 describe('/lib/logger', () => {
@@ -42,8 +42,8 @@ describe('/lib/logger', () => {
 
   test('should create all log level methods with .create()', () => {
     const localLogger = Logger.create({
-      serviceName: 'mock-service',
       moduleName: 'mock-module',
+      serviceName: 'mock-service',
     });
     expect(typeof localLogger.trace).toBe('function');
     expect(typeof localLogger.info).toBe('function');
@@ -70,9 +70,9 @@ describe('/lib/logger', () => {
     return new Promise((resolve) => {
       setTimeout(() => {
         logger.timeEnd('time-label', 'info', {
+          duration: 'I will be lost', // because this clashes with the duration it will be lost
           msg: 'fake-msg', // will be appended to 'Timer - '
           other: 'data', // will be preserved as is
-          duration: 'I will be lost', // because this clashes with the duration it will be lost
         });
         expect(loggerWrite).toHaveBeenCalledTimes(1);
 
@@ -104,9 +104,9 @@ describe('/lib/logger', () => {
       params: 4,
       path: 5,
       query: 6,
+      rubbish: 9,
       url: 7,
       user: 8,
-      rubbish: 9,
     };
     const actual = Logger.parseReq(object);
     delete object.rubbish;
@@ -115,11 +115,11 @@ describe('/lib/logger', () => {
   });
 
   test('should call create() multiple times without problem', async () => {
-    const logger1 = Logger.create({ serviceName: 'fake-service-1', moduleName: 'fake-module-1' });
+    const logger1 = Logger.create({ moduleName: 'fake-module-1', serviceName: 'fake-service-1' });
 
-    const logger2 = Logger.create({ serviceName: 'fake-service-1', moduleName: 'fake-module-2' });
+    const logger2 = Logger.create({ moduleName: 'fake-module-2', serviceName: 'fake-service-1' });
 
-    const logger3 = Logger.create({ serviceName: 'fake-service-3', moduleName: 'fake-module-2' });
+    const logger3 = Logger.create({ moduleName: 'fake-module-2', serviceName: 'fake-service-3' });
 
     expect(logger1).not.toBe(logger2);
     expect(logger1).not.toBe(logger3);
@@ -127,11 +127,11 @@ describe('/lib/logger', () => {
   });
 
   test('should new Logger() multiple times without problem', async () => {
-    const logger1 = new Logger({ serviceName: 'fake-service-1', moduleName: 'fake-module-1' });
+    const logger1 = new Logger({ moduleName: 'fake-module-1', serviceName: 'fake-service-1' });
 
-    const logger2 = new Logger({ serviceName: 'fake-service-1', moduleName: 'fake-module-2' });
+    const logger2 = new Logger({ moduleName: 'fake-module-2', serviceName: 'fake-service-1' });
 
-    const logger3 = new Logger({ serviceName: 'fake-service-3', moduleName: 'fake-module-2' });
+    const logger3 = new Logger({ moduleName: 'fake-module-2', serviceName: 'fake-service-3' });
 
     expect(logger1).not.toBe(logger2);
     expect(logger1).not.toBe(logger3);
@@ -140,9 +140,9 @@ describe('/lib/logger', () => {
 
   test('should create a logger with presets', () => {
     const testLogger = new Logger({
-      serviceName: 'fake-service-1',
       moduleName: 'fake-module-1',
       presets: { testProp: 'fake-track-id' },
+      serviceName: 'fake-service-1',
     });
     expect(typeof testLogger).toBe('object');
     expect(testLogger.presets.testProp).toBe('fake-track-id');
@@ -150,9 +150,9 @@ describe('/lib/logger', () => {
 
   test('should create a presets trackId with addTrackId option', () => {
     const testLogger = new Logger({
-      serviceName: 'fake-service-1',
-      moduleName: 'fake-module-1',
       addTrackId: true,
+      moduleName: 'fake-module-1',
+      serviceName: 'fake-service-1',
     });
     expect(typeof testLogger).toBe('object');
     expect(testLogger.presets.trackId).toHaveLength(36);

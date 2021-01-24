@@ -15,8 +15,9 @@ module.exports = {
     sourceType:  'module',  // Allows for the use of imports
   },
   "plugins": [
+    'sort-keys-fix',
+    "jest",
     "security",
-    "jest"
   ],
   "rules": {
     'import/no-unresolved': [0],
@@ -33,5 +34,6 @@ module.exports = {
     "jest/prefer-to-have-length": [2],
     "jest/valid-expect": [2],
     "security/detect-object-injection": [0],
+    'sort-keys-fix/sort-keys-fix': [2],
   }
 };

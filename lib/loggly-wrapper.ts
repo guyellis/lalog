@@ -22,12 +22,12 @@ const log = async (options: LogOptions, bulk: boolean): Promise<object> => {
     try {
       url = `https://logs-01.loggly.com/${pathPart}/${logglyToken}/tag/${tag}/`;
       fetchOptions = {
+        body,
         headers: {
-          'Content-Type': 'application/json',
           Accept: 'application/json',
+          'Content-Type': 'application/json',
         },
         method: 'POST',
-        body,
       };
 
       const result: Response = await fetch(url, fetchOptions);

@@ -191,9 +191,9 @@ export default class Logger {
 
     const logData = {
       ...extraLogData,
+      duration,
       msg,
       timerLabel: label,
-      duration,
     };
     return this.write(levelIndex, logData);
   }
@@ -219,7 +219,7 @@ export default class Logger {
       const errorId = logObj.errorId || v4();
       logObj.errorId = errorId;
       const { res, code } = response;
-      res.status(code).send({ success: false, errorId });
+      res.status(code).send({ errorId, success: false });
     }
 
     // When do we log?
@@ -268,11 +268,11 @@ export default class Logger {
         if (levelIndex >= currentLevelIndex) {
           // Need to batch log here
           this.isTransientTriggered = true;
-          await logBatch({ tag: this.tag, logObj: this.logCollector });
+          await logBatch({ logObj: this.logCollector, tag: this.tag });
           this.logCollector = null; // Can GC right away now that this array is no longer needed
         }
       } else {
-        return logSingle({ tag: this.tag, logObj });
+        return logSingle({ logObj, tag: this.tag });
       }
     }
     return Promise.resolve();

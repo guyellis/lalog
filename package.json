@@ -22,7 +22,7 @@
     "eslint-plugin-security": "1.4.0",
     "eslint-plugin-sort-keys-fix": "1.1.1",
     "jest": "25.5.4",
-    "jest-circus": "26.6.3",
+    "jest-circus": "27.0.1",
     "pre-commit": "1.2.2",
     "ts-jest": "25.5.1",
     "typescript": "3.9.9"

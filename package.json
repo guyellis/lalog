@@ -24,7 +24,7 @@
     "jest": "25.5.4",
     "pre-commit": "1.2.2",
     "ts-jest": "25.5.1",
-    "typescript": "3.9.9"
+    "typescript": "3.9.10"
   },
   "engines": {
     "node": ">=14",

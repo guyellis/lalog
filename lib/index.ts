@@ -1,4 +1,5 @@
 import { v4 } from 'uuid';
+import { Request, Response } from 'express';
 import { isObject } from './utils';
 
 import {
@@ -37,6 +38,17 @@ const getInitialLogLevel = (): number => {
 };
 
 let currentLevelIndex = getInitialLogLevel();
+
+export type ParseReqInOut = Request & { user?: unknown };
+
+interface LogData extends Record<string, unknown> {
+  msg?: string;
+}
+
+interface ResponseWrapper {
+  res: Response;
+  code: number;
+}
 
 export default class Logger {
   isTransient: boolean;
@@ -153,7 +165,7 @@ export default class Logger {
   /**
    * Parse the Express request (req) object for logging
    */
-  static parseReq(req: any): object {
+  static parseReq(req: ParseReqInOut): Partial<ParseReqInOut> {
     return {
       body: req.body,
       headers: req.headers,
@@ -178,7 +190,7 @@ export default class Logger {
   /**
    * Write the timer label end
    */
-  writeTimeEnd(label: string, level?: LevelType, extraLogDat?: any): Promise<any> {
+  writeTimeEnd(label: string, level?: LevelType, extraLogDat?: LogData): Promise<any> {
     const levelIndex = levels.indexOf(level ?? 'info');
     const extraLogData = extraLogDat || {};
     const time = this.timers[label];
@@ -201,7 +213,7 @@ export default class Logger {
   /**
    * Write log to destination
    */
-  async write(levelIndex: number, logData: any, response?: any): Promise<any> {
+  async write(levelIndex: number, logData: LogData, response?: ResponseWrapper): Promise<any> {
     if (!isObject(logData)) {
       // eslint-disable-next-line no-console
       console.error(`Expecting an object in logger write method but got "${typeof logData}"`);

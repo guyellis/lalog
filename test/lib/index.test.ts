@@ -1,4 +1,4 @@
-import Logger, { LevelType } from '../../lib';
+import Logger, { LevelType, ParseReqInOut } from '../../lib';
 
 let loggerWrite = jest.fn();
 Logger.prototype.write = (levelIndex: number, logObject: any): Promise<any> => {
@@ -107,9 +107,9 @@ describe('/lib/logger', () => {
       rubbish: 9,
       url: 7,
       user: 8,
-    };
+    } as unknown as ParseReqInOut;
     const actual = Logger.parseReq(object);
-    delete object.rubbish;
+    delete (object as unknown as { rubbish: number }).rubbish;
     expect(actual).toEqual(object);
     expect(actual).not.toBe(object);
   });

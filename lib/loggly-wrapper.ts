@@ -7,7 +7,9 @@ interface LogOptions {
   logObj: string;
 }
 
-const log = async (options: LogOptions, bulk: boolean): Promise<object> => {
+const log = async (
+  options: LogOptions, bulk: boolean,
+): Promise<Record<string, unknown>> => {
   const {
     tag,
     logglyToken = process.env.LOGGLY_TOKEN,
@@ -44,7 +46,7 @@ const log = async (options: LogOptions, bulk: boolean): Promise<object> => {
       // eslint-disable-next-line no-console
       console.error(`fetch() threw an error: ${err.message}
 url: ${url}
-options: ${safeJsonStringify(fetchOptions)}`);
+options: ${safeJsonStringify(fetchOptions as Record<string, unknown>)}`);
       return {};
     }
   }
@@ -60,7 +62,9 @@ export interface LogSingleOptions {
   logObj: any;
 }
 
-export const logSingle = (options: LogSingleOptions): object => {
+export const logSingle = (
+  options: LogSingleOptions,
+): Promise<Record<string, unknown> | void> => {
   const { logObj } = options;
   if (!isObject(logObj)) {
     // eslint-disable-next-line no-console
@@ -81,7 +85,9 @@ export interface LogBatchOptions {
   logObj: any[];
 }
 
-export const logBatch = async (options: LogBatchOptions): Promise<object|void> => {
+export const logBatch = async (
+  options: LogBatchOptions,
+): Promise<Record<string, unknown> | void> => {
   const { logObj } = options;
   if (!Array.isArray(logObj)) {
     // eslint-disable-next-line no-console

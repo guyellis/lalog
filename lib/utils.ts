@@ -1,5 +1,5 @@
 export const isObject = (
-  obj?: object | null,
+  obj?: Record<string, unknown> | null,
 ): boolean => !!obj && obj.toString() === '[object Object]' && !Array.isArray(obj);
 
 type CircularReplacer = (key: any, value: any) => any;
@@ -19,4 +19,6 @@ const getCircularReplacer = (): CircularReplacer => {
   };
 };
 
-export const safeJsonStringify = (obj: any): string => JSON.stringify(obj, getCircularReplacer());
+export const safeJsonStringify = (
+  obj: Record<string, unknown>,
+): string => JSON.stringify(obj, getCircularReplacer());

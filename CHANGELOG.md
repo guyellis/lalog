@@ -1,5 +1,13 @@
 # Changelog
 
+### 1.0.0 (2021-08-25)
+
+- Breaking
+  - Drop support for Node 12 and 14.
+- Changes
+  - Support Node 16
+  - Upgrade all dependencies to the latest
+
 ### 0.8.4 (2021-01-24)
 
 - Update dependencies

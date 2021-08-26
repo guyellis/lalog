@@ -109,7 +109,7 @@ describe('/lib/logger', () => {
       user: 8,
     } as unknown as ParseReqInOut;
     const actual = Logger.parseReq(object);
-    delete (object as unknown as { rubbish: number }).rubbish;
+    delete (object as unknown as { rubbish?: number }).rubbish;
     expect(actual).toEqual(object);
     expect(actual).not.toBe(object);
   });

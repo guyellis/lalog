@@ -6,12 +6,12 @@ import {
   logBatch,
   logSingle,
 } from './loggly-wrapper';
+import { BetterOmit } from './local-types';
 
 const levels = ['trace', 'info', 'warn', 'error', 'fatal', 'security'] as const;
 export type LevelType = typeof levels[number];
 
-export interface LogPresets {
-  [key: string]: string | undefined;
+export interface LogPresets extends Record<string, unknown> {
   module?: string;
   trackId?: string;
 }
@@ -24,8 +24,43 @@ export interface LaLogOptions {
   isTransient?: boolean;
 }
 
-export type LogFunction = (logData: any, response?: any) => Promise<any>;
-export type TimeLogFunction = (label: string, level?: LevelType, extraLogDat?: any) => Promise<any>;
+export type ParseReqIn = Request & { user?: unknown };
+export type ParseReqOut = Pick<ParseReqIn, 'body' |
+'headers' |
+'method' |
+'params' |
+'path' |
+'query' |
+'url' |
+'user'>;
+
+export interface LogData extends Record<string, unknown> {
+  err?: Error;
+  msg?: string;
+  req?: ParseReqIn;
+}
+
+interface LogDataOut extends BetterOmit<LogData, 'req'>, LogPresets {
+  /**
+   * The Stack property from the Error object split into lines.
+   */
+  fullStack?: string[];
+  /**
+  * Created from the fullStack by removing lines containing node_modules
+  */
+  shortStack?: string[];
+  req?: ParseReqOut;
+}
+
+export interface ResponseWrapper {
+  res: Response;
+  code: number;
+}
+
+export type LogFunction = (logData: LogData, response?: ResponseWrapper) => Promise<any>;
+export type TimeLogFunction = (
+  label: string, level?: LevelType, extraLogDat?: LogData,
+) => Promise<any>;
 
 const errorLevel = levels.indexOf('error');
 
@@ -38,17 +73,6 @@ const getInitialLogLevel = (): number => {
 };
 
 let currentLevelIndex = getInitialLogLevel();
-
-export type ParseReqInOut = Request & { user?: unknown };
-
-interface LogData extends Record<string, unknown> {
-  msg?: string;
-}
-
-interface ResponseWrapper {
-  res: Response;
-  code: number;
-}
 
 export default class Logger {
   isTransient: boolean;
@@ -165,7 +189,7 @@ export default class Logger {
   /**
    * Parse the Express request (req) object for logging
    */
-  static parseReq(req: ParseReqInOut): Partial<ParseReqInOut> {
+  static parseReq(req: ParseReqIn): ParseReqOut {
     return {
       body: req.body,
       headers: req.headers,
@@ -220,7 +244,8 @@ export default class Logger {
       return Promise.resolve();
     }
 
-    const logObj: any = { ...this.presets, ...logData };
+    const { req, ...rest } = logData;
+    const logObj: LogDataOut = { ...this.presets, ...rest };
 
     if (response) {
       // If the response object has been included with the call then it means we need to
@@ -257,7 +282,13 @@ export default class Logger {
       if (logObj.err) {
         if (!logObj.err.stack) {
           // This will happen if we manually created an err prop - it might not have a stack prop
-          logObj.err.stack = new Error().stack;
+          // `stack` is a non standard property on the Error object so it can be undefined
+          // which is why we have to provide the ??.
+          // Ignoring the line for code coverage for now because we're going to have to
+          // mock new Error() or extract this line into a local method that can be mocked
+          // which would add an extra frame to the stack which I don't want.
+          /* istanbul ignore next */
+          logObj.err.stack = new Error().stack ?? '<no error stack>';
         }
         logObj.fullStack = logObj.err.stack.split('\n').slice(1);
         /**
@@ -271,8 +302,8 @@ export default class Logger {
         delete logObj.err;
       }
 
-      if (logObj.req) {
-        logObj.req = Logger.parseReq(logObj.req);
+      if (req) {
+        logObj.req = Logger.parseReq(req);
       }
 
       if (this.logCollector !== null && !this.isTransientTriggered) {

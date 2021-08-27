@@ -1,5 +1,7 @@
 import fetch from 'node-fetch';
-import Logger from '../../lib';
+import { Request, Response } from 'express';
+
+import Logger, { LogData, ParseReqIn, ResponseWrapper } from '../../lib';
 import {
   logSingle, logBatch, LogSingleOptions, LogBatchOptions,
 } from '../../lib/loggly-wrapper';
@@ -200,7 +202,7 @@ describe('/lib/loggly-wrapper', () => {
   });
 
   test('should console.error if object not passed to log function', async () => {
-    await logger.error('i am a string');
+    await logger.error('i am a string' as unknown as LogData);
     expect(consoleError).toHaveBeenCalledTimes(1);
     const expected = 'Expecting an object in logger write method but got "string"';
     expect(consoleError).toHaveBeenCalledWith(expected);
@@ -210,6 +212,7 @@ describe('/lib/loggly-wrapper', () => {
     const req = {
       err: {
         message: 'Will be used for missing msg',
+        name: 'error name',
       },
       ip: '1.2.3.4',
       path: 'some path',
@@ -240,6 +243,7 @@ describe('/lib/loggly-wrapper', () => {
     const req = {
       err: {
         message: 'error message',
+        name: 'name',
       },
       ip: '1.2.3.4',
       msg: 'root message',
@@ -271,27 +275,29 @@ describe('/lib/loggly-wrapper', () => {
   });
 
   test('should parse a req object', async () => {
-    const logObj = {
-      req: {
-        body: 'body',
-        headers: 'headers',
-        method: 'method',
-        params: 'params',
-        path: 'path',
-        query: 'query',
-        random: 'random',
-        url: 'url',
-        user: 'user',
-      },
+    const req: ParseReqIn = {
+      body: 'body',
+      headers: 'headers',
+      method: 'method',
+      params: 'params',
+      path: 'path',
+      query: 'query',
+      random: 'random',
+      url: 'url',
+      user: 'user',
+    } as unknown as Request;
+
+    const logObj: LogData = {
+      req,
     };
 
     fetchMock.mockImplementation((url, options) => {
       const body = JSON.parse(options.body);
 
-      const { req } = body;
-      expect(req.body).toBe('body');
-      expect(req.url).toBe('url');
-      expect(req.random).toBeFalsy();
+      const { req: bodyReq } = body;
+      expect(bodyReq.body).toBe('body');
+      expect(bodyReq.url).toBe('url');
+      expect(bodyReq.random).toBeFalsy();
 
       return { json: (): Record<string, unknown> => ({}), status: 200 };
     });
@@ -302,17 +308,19 @@ describe('/lib/loggly-wrapper', () => {
   });
 
   test('should call res.send when response parameter is included', async () => {
-    const response = {
-      code: 1234,
-      res: {
-        send: (obj: any): void => {
-          expect(obj.success).toBe(false);
-        },
-        status: (c: number): any => {
-          expect(c).toBe(1234);
-          return response.res;
-        },
+    const res = {
+      send: (obj: any): void => {
+        expect(obj.success).toBe(false);
       },
+      status: (c: number): any => {
+        expect(c).toBe(1234);
+        return res;
+      },
+    } as Response;
+
+    const response: ResponseWrapper = {
+      code: 1234,
+      res,
     };
 
     const logData = {

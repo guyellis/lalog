@@ -42,7 +42,11 @@ const log = async (
       }
 
       return result.json();
-    } catch (err) {
+    } catch (error: unknown) {
+      // Typescript requires the instanceof syntax which is why we have
+      // this istanbul ignore directive.
+      /* istanbul ignore next */
+      const err = error instanceof Error ? error : new Error('unknown');
       // eslint-disable-next-line no-console
       console.error(`fetch() threw an error: ${err.message}
 url: ${url}

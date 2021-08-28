@@ -117,7 +117,7 @@ describe('/lib/loggly-wrapper', () => {
       fetchMock.mockResolvedValue(resp);
 
       logger.time('my-time-label');
-      await logger.timeEnd('my-time-label');
+      await logger.timeEnd('my-time-label', 'info');
       expect(fetch).not.toHaveBeenCalled();
     });
 
@@ -179,7 +179,7 @@ describe('/lib/loggly-wrapper', () => {
       });
 
       logger.time('my-time-label');
-      await logger.timeEnd('my-time-label-missing');
+      await logger.timeEnd('my-time-label-missing', 'info');
       expect(fetch).toHaveBeenCalledTimes(1);
       // TODO: This is wrong - should be 6 - but Jest thinks it's 5.
       // Happened during 23.x to 24.x Jest upgrade

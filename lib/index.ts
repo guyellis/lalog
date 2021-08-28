@@ -59,17 +59,17 @@ export interface ResponseWrapper {
 
 export type LogFunction = (logData: LogData, response?: ResponseWrapper) => Promise<any>;
 export type TimeLogFunction = (
-  label: string, level?: LevelType, extraLogDat?: LogData,
+  label: string, level: LevelType, extraLogDat?: LogData,
 ) => Promise<any>;
 
 const errorLevel = levels.indexOf('error');
 
 const getInitialLogLevel = (): number => {
   const laLogLevel = process.env.LALOG_LEVEL as LevelType;
-  if (levels.includes(laLogLevel || '')) {
+  if (levels.includes(laLogLevel)) {
     return levels.indexOf(laLogLevel);
   }
-  return levels.indexOf('error');
+  return errorLevel;
 };
 
 let currentLevelIndex = getInitialLogLevel();
@@ -214,8 +214,8 @@ export default class Logger {
   /**
    * Write the timer label end
    */
-  writeTimeEnd(label: string, level?: LevelType, extraLogDat?: LogData): Promise<any> {
-    const levelIndex = levels.indexOf(level ?? 'info');
+  writeTimeEnd(label: string, level: LevelType, extraLogDat?: LogData): Promise<any> {
+    const levelIndex = levels.indexOf(level);
     const extraLogData = extraLogDat || {};
     const time = this.timers[label];
     const duration = Object.prototype.hasOwnProperty.call(this.timers, label)

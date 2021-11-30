@@ -7,9 +7,7 @@ interface LogOptions {
   logObj: string;
 }
 
-const log = async (
-  options: LogOptions, bulk: boolean,
-): Promise<Record<string, unknown>> => {
+const log = async (options: LogOptions, bulk: boolean): Promise<Record<string, unknown>> => {
   const {
     tag,
     logglyToken = process.env.LOGGLY_TOKEN,

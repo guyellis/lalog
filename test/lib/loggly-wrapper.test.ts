@@ -51,6 +51,79 @@ describe('/lib/loggly-wrapper', () => {
     fetchMock.mockResolvedValue(resp);
 
     await logger.error(logObj);
+    const [logglyUrl, fetchOptions] = (fetch as unknown as jest.Mock).mock.calls[0];
+    const { body: bodyString, ...fetchOptionsRest } = fetchOptions;
+    const bodyOne = JSON.parse(bodyString);
+    const { fullStack, shortStack, ...body } = bodyOne;
+    expect(fullStack.length).toBeGreaterThan(0);
+    expect(shortStack.length).toBeGreaterThan(0);
+    expect(fullStack.length).toBeGreaterThanOrEqual(shortStack.length);
+    expect(body).toMatchInlineSnapshot(`
+      Object {
+        "ip": "1.2.3.4",
+        "level": "error",
+        "module": "test-logger",
+        "msg": "",
+        "path": "some path",
+        "user": "some user",
+      }
+      `);
+    expect(fetchOptionsRest).toMatchInlineSnapshot(`
+      Object {
+        "headers": Object {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+        },
+        "method": "POST",
+      }
+      `);
+    expect(logglyUrl).toMatchInlineSnapshot('"https://logs-01.loggly.com/inputs/test-loggly-token/tag/test-service-development/"');
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
+  test('should log extra values in Error prop', async () => {
+    const err = new Error('Test error message');
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    err.code = 'test_error_code';
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    err.status = 500;
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    err.url = undefined;
+    const logObj = {
+      err,
+      ip: '1.2.3.4',
+      path: 'some path',
+      user: 'some user',
+    };
+
+    const resp = { json: (): Record<string, unknown> => ({}), status: 200 };
+    fetchMock.mockResolvedValue(resp);
+
+    await logger.error(logObj);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [_logglyUrl, fetchOptions] = (fetch as unknown as jest.Mock).mock.calls[0];
+    const {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      fullStack: _fullStack,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      shortStack: _shortStack,
+      ...body
+    } = JSON.parse(fetchOptions.body);
+    // This snapshot is not correct and should be fixed in:
+    // https://github.com/guyellis/lalog/issues/876
+    expect(body).toMatchInlineSnapshot(`
+      Object {
+        "ip": "1.2.3.4",
+        "level": "error",
+        "module": "test-logger",
+        "msg": "Test error message",
+        "path": "some path",
+        "user": "some user",
+      }
+      `);
     expect(fetch).toHaveBeenCalledTimes(1);
   });
 

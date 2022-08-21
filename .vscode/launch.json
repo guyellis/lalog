@@ -16,8 +16,28 @@
       "${relativeFile}"
     ],
     "console": "integratedTerminal",
+    "runtimeVersion": "16.15.0",
     "internalConsoleOptions": "neverOpen",
-    "port": 9229,
     "skipFiles": ["<node_internals>/**/*.js"]
-  }]
+  },
+  {
+    "name": "Jest Update (this file)",
+    "type": "node",
+    "request": "launch",
+    "env": {
+      "SKIP_COVERAGE": "1",
+    },
+    "runtimeArgs": [
+      "--inspect-brk",
+      "${workspaceFolder}/node_modules/.bin/jest",
+      "${relativeFile}",
+      "-u",
+      "-b"
+    ],
+    "console": "integratedTerminal",
+    "internalConsoleOptions": "neverOpen",
+    "runtimeVersion": "16.15.0",
+    "skipFiles": ["<node_internals>/**/*.js"]
+  }
+]
 }

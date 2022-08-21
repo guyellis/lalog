@@ -20,7 +20,7 @@ describe('/lib/logger', () => {
     loggerWrite.mockRestore();
   });
 
-  test('should log a security log', () => {
+  test('should log the happy path', () => {
     const req = {
       ip: '1.2.3.4',
       path: 'some path',
@@ -32,6 +32,56 @@ describe('/lib/logger', () => {
 
     logger.info(req);
     expect(loggerWrite).toHaveBeenCalledWith(1, req);
+  });
+
+  test('should log a security log', () => {
+    const req = {
+      ip: '1.2.3.4',
+      path: 'some path',
+      user: 'some user',
+    };
+
+    logger.security(req);
+    const [level, logData] = loggerWrite.mock.calls[0];
+    expect(level).toBe(5);
+    expect(logData).toMatchInlineSnapshot(`
+      Object {
+        "ip": "1.2.3.4",
+        "path": "some path",
+        "user": "some user",
+      }
+      `);
+  });
+
+  test('should log an error log', () => {
+    const err = new Error('Test error message');
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    err.code = 'test_error_code';
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    err.status = 500;
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    err.url = undefined;
+    const req = {
+      err,
+      ip: '1.2.3.4',
+      path: 'some path',
+      user: 'some user',
+    };
+
+    logger.error(req);
+    const [level, logData] = loggerWrite.mock.calls[0];
+    expect(level).toBe(3);
+    expect(logData).toMatchInlineSnapshot(`
+      Object {
+        "err": [Error: Test error message],
+        "ip": "1.2.3.4",
+        "path": "some path",
+        "user": "some user",
+      }
+      `);
   });
 
   test('should get all Levels', () => {

@@ -1,5 +1,23 @@
 # Changelog
 
+### 2.0.0 (2022-08-22)
+
+- Breaking
+  - Restructure Error props inside `err` prop including `fullStack` and `shortStack`.
+- Fixes
+  - Include all props in `Error` object
+  - Upgrade dependencies
+
+### 1.0.2 (2021.08.28)
+
+- Fixes
+  - Make log level a required param
+
+### 1.0.1 (2021.08.27)
+
+- Fixes
+  - Fix typing and error object handling bug
+
 ### 1.0.0 (2021-08-25)
 
 - Breaking

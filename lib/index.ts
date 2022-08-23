@@ -1,66 +1,14 @@
 import { v4 } from 'uuid';
-import { Request, Response } from 'express';
-import { isObject } from './utils';
+import { enrichError, isObject } from './utils';
 
 import {
   logBatch,
   logSingle,
 } from './loggly-wrapper';
-import { BetterOmit } from './local-types';
-
-const levels = ['trace', 'info', 'warn', 'error', 'fatal', 'security'] as const;
-export type LevelType = typeof levels[number];
-
-export interface LogPresets extends Record<string, unknown> {
-  module?: string;
-  trackId?: string;
-}
-
-export interface LaLogOptions {
-  addTrackId?: boolean;
-  moduleName?: string;
-  presets?: LogPresets;
-  serviceName?: string;
-  isTransient?: boolean;
-}
-
-export type ParseReqIn = Request & { user?: unknown };
-export type ParseReqOut = Pick<ParseReqIn, 'body' |
-'headers' |
-'method' |
-'params' |
-'path' |
-'query' |
-'url' |
-'user'>;
-
-export interface LogData extends Record<string, unknown> {
-  err?: Error;
-  msg?: string;
-  req?: ParseReqIn;
-}
-
-interface LogDataOut extends BetterOmit<LogData, 'req'>, LogPresets {
-  /**
-   * The Stack property from the Error object split into lines.
-   */
-  fullStack?: string[];
-  /**
-  * Created from the fullStack by removing lines containing node_modules
-  */
-  shortStack?: string[];
-  req?: ParseReqOut;
-}
-
-export interface ResponseWrapper {
-  res: Response;
-  code: number;
-}
-
-export type LogFunction = (logData: LogData, response?: ResponseWrapper) => Promise<any>;
-export type TimeLogFunction = (
-  label: string, level: LevelType, extraLogDat?: LogData,
-) => Promise<any>;
+import {
+  LaLogOptions, levels, LevelType, LogData, logDataEnriched, LogDataOut, LogFunction,
+  LogPresets, ParseReqIn, ParseReqOut, ResponseWrapper, TimeLogFunction,
+} from './local-types';
 
 const errorLevel = levels.indexOf('error');
 
@@ -245,7 +193,7 @@ export default class Logger {
     }
 
     const { req, ...rest } = logData;
-    const logObj: LogDataOut = { ...this.presets, ...rest };
+    let logObj: logDataEnriched | LogDataOut = { ...this.presets, ...rest };
 
     if (response) {
       // If the response object has been included with the call then it means we need to
@@ -279,28 +227,7 @@ export default class Logger {
         logObj.err = new Error();
       }
 
-      if (logObj.err) {
-        if (!logObj.err.stack) {
-          // This will happen if we manually created an err prop - it might not have a stack prop
-          // `stack` is a non standard property on the Error object so it can be undefined
-          // which is why we have to provide the ??.
-          // Ignoring the line for code coverage for now because we're going to have to
-          // mock new Error() or extract this line into a local method that can be mocked
-          // which would add an extra frame to the stack which I don't want.
-          /* istanbul ignore next */
-          logObj.err.stack = new Error().stack ?? '<no error stack>';
-        }
-        logObj.fullStack = logObj.err.stack.split('\n').slice(1);
-        /**
-         * Checks if string includes node_modules
-         */
-        const hasNodeModules = (i: string): boolean => !i.includes('/node_modules/');
-        logObj.shortStack = logObj.fullStack.filter(hasNodeModules);
-        if (!logObj.msg) {
-          logObj.msg = logObj.err.message;
-        }
-        delete logObj.err;
-      }
+      logObj = enrichError(logObj);
 
       if (req) {
         logObj.req = Logger.parseReq(req);

@@ -1,4 +1,5 @@
-import { isObject, safeJsonStringify } from '../../lib/utils';
+import { logDataEnriched, LogDataOut } from '../../lib/local-types';
+import { enrichError, isObject, safeJsonStringify } from '../../lib/utils';
 
 describe('utils', () => {
   test('isObject', () => {
@@ -41,5 +42,72 @@ describe('utils', () => {
     circular.four = circular;
     const result = safeJsonStringify(circular);
     expect(result).toMatchSnapshot();
+  });
+
+  test('Missing err prop does nothing', () => {
+    const body = {
+      data: 'some-string',
+      url: 'some-url',
+    };
+    expect(enrichError(body)).toMatchInlineSnapshot(`
+      Object {
+        "data": "some-string",
+        "url": "some-url",
+      }
+      `);
+  });
+
+  test('err prop that is not instanceof Error does nothing', () => {
+    const logObj: LogDataOut = {
+      data: 'some-string',
+      err: 'not a real Error' as unknown as Error,
+      url: 'some-url',
+    };
+    const body = enrichError(logObj) as logDataEnriched;
+    delete body.err.fullStack;
+    delete body.err.shortStack;
+    expect(body).toMatchInlineSnapshot(`
+Object {
+  "data": "some-string",
+  "err": Object {},
+  "url": "some-url",
+}
+`);
+  });
+
+  test('Error err prop is enriched', () => {
+    const err = new Error('Test error message');
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    err.code = 'test_error_code';
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    err.status = 500;
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    err.url = undefined;
+
+    const logObj = {
+      data: 'some-string',
+      err,
+      url: 'some-url',
+    };
+
+    const body = enrichError(logObj) as logDataEnriched;
+    delete body.err.fullStack;
+    delete body.err.shortStack;
+    expect(body).toMatchInlineSnapshot(`
+      Object {
+        "data": "some-string",
+        "err": Object {
+          "code": "test_error_code",
+          "message": "Test error message",
+          "name": "Error",
+          "status": 500,
+          "url": undefined,
+        },
+        "url": "some-url",
+      }
+      `);
   });
 });

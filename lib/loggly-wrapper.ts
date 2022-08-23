@@ -97,7 +97,7 @@ export const logBatch = async (
     return Promise.resolve();
   }
 
-  const body = logObj.map(safeJsonStringify).join('\n');
+  const body = logObj.map((logEntry) => safeJsonStringify(logEntry)).join('\n');
   return log({
     ...options,
     logObj: body,

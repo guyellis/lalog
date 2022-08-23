@@ -1,10 +1,11 @@
 import fetch from 'node-fetch';
 import { Request, Response } from 'express';
 
-import Logger, { LogData, ParseReqIn, ResponseWrapper } from '../../lib';
+import Logger from '../../lib';
 import {
   logSingle, logBatch, LogSingleOptions, LogBatchOptions,
 } from '../../lib/loggly-wrapper';
+import { LogData, ParseReqIn, ResponseWrapper } from '../../lib/local-types';
 
 jest.mock('node-fetch');
 
@@ -54,16 +55,15 @@ describe('/lib/loggly-wrapper', () => {
     const [logglyUrl, fetchOptions] = (fetch as unknown as jest.Mock).mock.calls[0];
     const { body: bodyString, ...fetchOptionsRest } = fetchOptions;
     const bodyOne = JSON.parse(bodyString);
-    const { fullStack, shortStack, ...body } = bodyOne;
-    expect(fullStack.length).toBeGreaterThan(0);
-    expect(shortStack.length).toBeGreaterThan(0);
-    expect(fullStack.length).toBeGreaterThanOrEqual(shortStack.length);
+    const { err, ...body } = bodyOne;
+    expect(err.fullStack.length).toBeGreaterThan(0);
+    expect(err.shortStack.length).toBeGreaterThan(0);
+    expect(err.fullStack.length).toBeGreaterThanOrEqual(err.shortStack.length);
     expect(body).toMatchInlineSnapshot(`
       Object {
         "ip": "1.2.3.4",
         "level": "error",
         "module": "test-logger",
-        "msg": "",
         "path": "some path",
         "user": "some user",
       }
@@ -105,21 +105,20 @@ describe('/lib/loggly-wrapper', () => {
     await logger.error(logObj);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [_logglyUrl, fetchOptions] = (fetch as unknown as jest.Mock).mock.calls[0];
-    const {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      fullStack: _fullStack,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      shortStack: _shortStack,
-      ...body
-    } = JSON.parse(fetchOptions.body);
-    // This snapshot is not correct and should be fixed in:
-    // https://github.com/guyellis/lalog/issues/876
+    const body = JSON.parse(fetchOptions.body);
+    delete body.err.fullStack;
+    delete body.err.shortStack;
     expect(body).toMatchInlineSnapshot(`
       Object {
+        "err": Object {
+          "code": "test_error_code",
+          "message": "Test error message",
+          "name": "Error",
+          "status": 500,
+        },
         "ip": "1.2.3.4",
         "level": "error",
         "module": "test-logger",
-        "msg": "Test error message",
         "path": "some path",
         "user": "some user",
       }
@@ -225,7 +224,7 @@ describe('/lib/loggly-wrapper', () => {
       await logger.timeEnd('my-time-label', 'error', extraLogData);
       expect(fetch).toHaveBeenCalledTimes(1);
       expect(Date.now).toHaveBeenCalledTimes(2);
-      expect.assertions(11);
+      expect.assertions(10);
 
       Date.now = originalDateNow;
     });
@@ -309,7 +308,7 @@ describe('/lib/loggly-wrapper', () => {
 
     await logger.error(req);
     expect(fetch).toHaveBeenCalledTimes(1);
-    expect.assertions(6);
+    expect.assertions(4);
   });
 
   test('should use object message if present', async () => {
@@ -339,7 +338,7 @@ describe('/lib/loggly-wrapper', () => {
 
     await logger.error(req);
     expect(fetch).toHaveBeenCalledTimes(1);
-    expect.assertions(4);
+    expect.assertions(2);
   });
 
   test('should not log if level is too low', async () => {

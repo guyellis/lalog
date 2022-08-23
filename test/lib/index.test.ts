@@ -1,4 +1,5 @@
-import Logger, { LevelType, ParseReqIn } from '../../lib';
+import Logger from '../../lib';
+import { LevelType, ParseReqIn } from '../../lib/local-types';
 
 let loggerWrite = jest.fn();
 Logger.prototype.write = (levelIndex: number, logObject: any): Promise<any> => {

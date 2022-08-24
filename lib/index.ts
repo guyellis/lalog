@@ -10,6 +10,8 @@ import {
   LogPresets, ParseReqIn, ParseReqOut, ResponseWrapper, TimeLogFunction,
 } from './local-types';
 
+export * from './local-types';
+
 const errorLevel = levels.indexOf('error');
 
 const getInitialLogLevel = (): number => {

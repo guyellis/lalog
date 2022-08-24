@@ -1,5 +1,10 @@
 # Changelog
 
+### 2.0.1 (2022-08-24)
+
+- Fixes
+  - TypeScript only. Export types from the index again. Brings back to parity.
+
 ### 2.0.0 (2022-08-22)
 
 - Breaking

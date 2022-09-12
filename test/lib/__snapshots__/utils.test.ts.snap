@@ -1,9 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`utils safeJsonStringify 1`] = `"{\\"one\\":\\"one\\",\\"two\\":{\\"three\\":3}}"`;
+exports[`utils safeJsonStringify 1`] = `"{"one":"one","two":{"three":3}}"`;
 
 exports[`utils safeJsonStringify 2`] = `"null"`;
 
-exports[`utils safeJsonStringify 3`] = `"\\"i am string\\""`;
+exports[`utils safeJsonStringify 3`] = `""i am string""`;
 
-exports[`utils safeJsonStringify circular 1`] = `"{\\"one\\":\\"one\\",\\"two\\":{\\"three\\":3},\\"four\\":\\"[CIRCULAR]\\"}"`;
+exports[`utils safeJsonStringify circular 1`] = `"{"one":"one","two":{"three":3},"four":"[CIRCULAR]"}"`;

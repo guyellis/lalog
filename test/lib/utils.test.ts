@@ -50,11 +50,11 @@ describe('utils', () => {
       url: 'some-url',
     };
     expect(enrichError(body)).toMatchInlineSnapshot(`
-      Object {
-        "data": "some-string",
-        "url": "some-url",
-      }
-      `);
+{
+  "data": "some-string",
+  "url": "some-url",
+}
+`);
   });
 
   test('err prop that is not instanceof Error does nothing', () => {
@@ -67,9 +67,9 @@ describe('utils', () => {
     delete body.err.fullStack;
     delete body.err.shortStack;
     expect(body).toMatchInlineSnapshot(`
-Object {
+{
   "data": "some-string",
-  "err": Object {},
+  "err": {},
   "url": "some-url",
 }
 `);
@@ -97,17 +97,17 @@ Object {
     delete body.err.fullStack;
     delete body.err.shortStack;
     expect(body).toMatchInlineSnapshot(`
-      Object {
-        "data": "some-string",
-        "err": Object {
-          "code": "test_error_code",
-          "message": "Test error message",
-          "name": "Error",
-          "status": 500,
-          "url": undefined,
-        },
-        "url": "some-url",
-      }
-      `);
+{
+  "data": "some-string",
+  "err": {
+    "code": "test_error_code",
+    "message": "Test error message",
+    "name": "Error",
+    "status": 500,
+    "url": undefined,
+  },
+  "url": "some-url",
+}
+`);
   });
 });

@@ -60,23 +60,23 @@ describe('/lib/loggly-wrapper', () => {
     expect(err.shortStack.length).toBeGreaterThan(0);
     expect(err.fullStack.length).toBeGreaterThanOrEqual(err.shortStack.length);
     expect(body).toMatchInlineSnapshot(`
-      Object {
-        "ip": "1.2.3.4",
-        "level": "error",
-        "module": "test-logger",
-        "path": "some path",
-        "user": "some user",
-      }
-      `);
+{
+  "ip": "1.2.3.4",
+  "level": "error",
+  "module": "test-logger",
+  "path": "some path",
+  "user": "some user",
+}
+`);
     expect(fetchOptionsRest).toMatchInlineSnapshot(`
-      Object {
-        "headers": Object {
-          "Accept": "application/json",
-          "Content-Type": "application/json",
-        },
-        "method": "POST",
-      }
-      `);
+{
+  "headers": {
+    "Accept": "application/json",
+    "Content-Type": "application/json",
+  },
+  "method": "POST",
+}
+`);
     expect(logglyUrl).toMatchInlineSnapshot('"https://logs-01.loggly.com/inputs/test-loggly-token/tag/test-service-development/"');
     expect(fetch).toHaveBeenCalledTimes(1);
   });
@@ -109,20 +109,20 @@ describe('/lib/loggly-wrapper', () => {
     delete body.err.fullStack;
     delete body.err.shortStack;
     expect(body).toMatchInlineSnapshot(`
-      Object {
-        "err": Object {
-          "code": "test_error_code",
-          "message": "Test error message",
-          "name": "Error",
-          "status": 500,
-        },
-        "ip": "1.2.3.4",
-        "level": "error",
-        "module": "test-logger",
-        "path": "some path",
-        "user": "some user",
-      }
-      `);
+{
+  "err": {
+    "code": "test_error_code",
+    "message": "Test error message",
+    "name": "Error",
+    "status": 500,
+  },
+  "ip": "1.2.3.4",
+  "level": "error",
+  "module": "test-logger",
+  "path": "some path",
+  "user": "some user",
+}
+`);
     expect(fetch).toHaveBeenCalledTimes(1);
   });
 

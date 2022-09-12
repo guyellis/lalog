@@ -46,12 +46,12 @@ describe('/lib/logger', () => {
     const [level, logData] = loggerWrite.mock.calls[0];
     expect(level).toBe(5);
     expect(logData).toMatchInlineSnapshot(`
-      Object {
-        "ip": "1.2.3.4",
-        "path": "some path",
-        "user": "some user",
-      }
-      `);
+{
+  "ip": "1.2.3.4",
+  "path": "some path",
+  "user": "some user",
+}
+`);
   });
 
   test('should log an error log', () => {
@@ -76,13 +76,13 @@ describe('/lib/logger', () => {
     const [level, logData] = loggerWrite.mock.calls[0];
     expect(level).toBe(3);
     expect(logData).toMatchInlineSnapshot(`
-      Object {
-        "err": [Error: Test error message],
-        "ip": "1.2.3.4",
-        "path": "some path",
-        "user": "some user",
-      }
-      `);
+{
+  "err": [Error: Test error message],
+  "ip": "1.2.3.4",
+  "path": "some path",
+  "user": "some user",
+}
+`);
   });
 
   test('should get all Levels', () => {

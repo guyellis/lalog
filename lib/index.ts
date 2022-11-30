@@ -1,4 +1,4 @@
-import { v4 } from 'uuid';
+import { randomUUID } from 'crypto';
 import { enrichError, isObject } from './utils';
 
 import {
@@ -72,7 +72,7 @@ export default class Logger {
     };
 
     if (addTrackId && !this.presets.trackId) {
-      this.presets.trackId = v4();
+      this.presets.trackId = randomUUID();
     }
 
     this.tag = `${serviceName}-${process.env.NODE_ENV}`;
@@ -203,7 +203,7 @@ export default class Logger {
       // Prima facie this seems like a terrible idea but it seems to work well as
       // a response can be immediately sent to the client which includes a code
       // that can be provided to the user and links back to the error log.
-      const errorId = logObj.errorId || v4();
+      const errorId = logObj.errorId || randomUUID();
       logObj.errorId = errorId;
       const { res, code } = response;
       res.status(code).send({ errorId, success: false });

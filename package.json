@@ -4,8 +4,7 @@
     "url": "https://github.com/guyellis/lalog/issues"
   },
   "dependencies": {
-    "node-fetch": "2.6.7",
-    "uuid": "9.0.0"
+    "node-fetch": "2.6.7"
   },
   "description": "Logging aggregation and distribution",
   "devDependencies": {
@@ -13,7 +12,6 @@
     "@types/jest": "29.2.3",
     "@types/node": "18.11.9",
     "@types/node-fetch": "2.6.2",
-    "@types/uuid": "8.3.4",
     "@typescript-eslint/eslint-plugin": "5.45.0",
     "@typescript-eslint/parser": "5.45.0",
     "eslint": "8.28.0",

@@ -16,7 +16,7 @@
       "${relativeFile}"
     ],
     "console": "integratedTerminal",
-    "runtimeVersion": "18.12.1",
+    "runtimeVersion": "20.9.0",
     "internalConsoleOptions": "neverOpen",
     "skipFiles": ["<node_internals>/**/*.js"]
   },
@@ -36,7 +36,7 @@
     ],
     "console": "integratedTerminal",
     "internalConsoleOptions": "neverOpen",
-    "runtimeVersion": "18.12.1",
+    "runtimeVersion": "20.9.0",
     "skipFiles": ["<node_internals>/**/*.js"]
   }
 ]

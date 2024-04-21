@@ -1,12 +1,12 @@
 import fetch from 'node-fetch';
 import { Request, Response } from 'express';
 
-import Logger from '../../lib';
+import Logger from '../../../lib';
 import {
   logSingle, logBatch,
-} from '../../lib/loggly/loggly-wrapper';
-import { LogData, ParseReqIn, ResponseWrapper } from '../../lib/local-types';
-import { LogBatchOptions, LogSingleOptions } from '../../lib/utils';
+} from '../../../lib/loggly/loggly-wrapper';
+import { LogData, ParseReqIn, ResponseWrapper } from '../../../lib/local-types';
+import { LogBatchOptions, LogSingleOptions } from '../../../lib/utils';
 
 jest.mock('node-fetch');
 
@@ -21,7 +21,7 @@ global.console = {} as Console;
 
 const fetchMock = fetch as unknown as jest.Mock;
 
-describe('/lib/loggly-wrapper', () => {
+describe('/lib/loggly/loggly-wrapper', () => {
   beforeAll(() => {
     // Set log level to "error" before tests start running
     Logger.setLevel('error');

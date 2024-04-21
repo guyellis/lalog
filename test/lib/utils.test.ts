@@ -113,8 +113,13 @@ describe('utils', () => {
 `);
   });
 
-  test('getLoggerService throw for unimplemented', async () => {
-    expect(() => getLoggerService('gcp')).toThrowErrorMatchingInlineSnapshot('"gcp logger service not implemented"');
+  test('getLoggerService gets gcp loggers', async () => {
+    expect(getLoggerService('gcp')).toMatchInlineSnapshot(`
+{
+  "logBatch": [Function],
+  "logSingle": [Function],
+}
+`);
   });
 
   test('getLoggerService throws for invalid', async () => {

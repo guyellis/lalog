@@ -89,3 +89,8 @@ export const logBatch: LogBatch = async (options) => {
     logObj: body,
   }, true);
 };
+
+export const logglyLoggers = {
+  logBatch,
+  logSingle,
+};

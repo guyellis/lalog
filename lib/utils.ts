@@ -1,8 +1,6 @@
 import { logDataEnriched, LogDataOut, LoggerService } from './local-types';
-import {
-  logBatch as logglyLogBatch,
-  logSingle as logglyLogSingle,
-} from './loggly/loggly-wrapper';
+import { logglyLoggers } from './loggly/loggly-wrapper';
+import { gcpLoggers } from './gcp/gcp-wrapper-copy';
 
 export const isObject = (
   obj?: Record<string, unknown> | null,
@@ -89,12 +87,9 @@ export type LogSingle = (
 export const getLoggerService = (loggerService: LoggerService) => {
   switch (loggerService) {
     case 'gcp':
-      throw new Error('gcp logger service not implemented');
+      return gcpLoggers;
     case 'loggly':
-      return {
-        logBatch: logglyLogBatch,
-        logSingle: logglyLogSingle,
-      };
+      return logglyLoggers;
     default:
       throw new Error('invalid logger service');
   }

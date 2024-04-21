@@ -1,12 +1,20 @@
 import fetch from 'node-fetch';
 
-import Logger from '../../../lib';
+import Logger, { GcpLoggerService } from '../../../lib';
 import {
-  logSingle, logBatch, forTest,
+  gcpLoggers, forTest,
 } from '../../../lib/gcp/gcp-wrapper';
 import { LogBatchOptions, LogSingleOptions } from '../../../lib/utils';
 
 const { log } = forTest;
+
+const serviceCredentials: GcpLoggerService = {
+  email: 'email',
+  key: 'key',
+  projectId: 'projectId',
+  type: 'gcp',
+};
+const { logBatch, logSingle } = gcpLoggers(serviceCredentials);
 
 jest.mock('node-fetch');
 
@@ -53,6 +61,7 @@ describe('/lib/gcp/gcp-wrapper', () => {
   test.skip('placeholder for log', async () => {
     const actual = await log({
       logObj: [{ one: 'logObject' }],
+      serviceCredentials,
       tag: 'tag',
     });
     expect(actual).toMatchInlineSnapshot(`

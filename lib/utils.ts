@@ -85,11 +85,11 @@ export type LogSingle = (
 ) => Promise<Record<string, unknown> | void>;
 
 export const getLoggerService = (loggerService: LoggerService) => {
-  switch (loggerService) {
+  switch (loggerService.type) {
     case 'gcp':
-      return gcpLoggers;
+      return gcpLoggers(loggerService);
     case 'loggly':
-      return logglyLoggers;
+      return logglyLoggers(loggerService);
     default:
       throw new Error('invalid logger service');
   }

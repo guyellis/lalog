@@ -2,11 +2,13 @@ import fetch, { RequestInit, Response } from 'node-fetch';
 import {
   LogBatch, LogSingle, isObject, safeJsonStringify,
 } from '../utils';
+import { LogglyLoggerService } from '../local-types';
 
 interface LogOptions {
   tag: string;
   logglyToken?: string;
   logObj: string;
+  serviceCredentials?: LogglyLoggerService;
 }
 
 const log = async (options: LogOptions, bulk: boolean): Promise<Record<string, unknown>> => {
@@ -60,7 +62,7 @@ options: ${safeJsonStringify(fetchOptions as Record<string, unknown>)}`);
   return {};
 };
 
-export const logSingle: LogSingle = (options) => {
+const logSingleSetup = (serviceCredentials: LogglyLoggerService) : LogSingle => async (options) => {
   const { logObj } = options;
   if (!isObject(logObj)) {
     // eslint-disable-next-line no-console
@@ -72,10 +74,11 @@ export const logSingle: LogSingle = (options) => {
   return log({
     ...options,
     logObj: body,
+    serviceCredentials,
   }, false);
 };
 
-export const logBatch: LogBatch = async (options) => {
+const logBatchSetup = (serviceCredentials: LogglyLoggerService): LogBatch => async (options) => {
   const { logObj } = options;
   if (!Array.isArray(logObj)) {
     // eslint-disable-next-line no-console
@@ -87,10 +90,11 @@ export const logBatch: LogBatch = async (options) => {
   return log({
     ...options,
     logObj: body,
+    serviceCredentials,
   }, true);
 };
 
-export const logglyLoggers = {
-  logBatch,
-  logSingle,
-};
+export const logglyLoggers = (serviceCredentials: LogglyLoggerService) => ({
+  logBatch: logBatchSetup(serviceCredentials),
+  logSingle: logSingleSetup(serviceCredentials),
+});

@@ -11,8 +11,19 @@ export interface LogPresets extends Record<string, unknown> {
   trackId?: string;
 }
 
-const loggerServices = ['loggly', 'gcp'] as const;
-export type LoggerService = typeof loggerServices[number];
+export interface GcpLoggerService {
+  email: string;
+  key: string;
+  projectId: string;
+  type: 'gcp';
+}
+
+export interface LogglyLoggerService {
+  // logglyToken?: string;
+  type: 'loggly';
+}
+
+export type LoggerService = GcpLoggerService | LogglyLoggerService;
 
 export interface LaLogOptions {
   addTrackId?: boolean;

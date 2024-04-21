@@ -3,19 +3,19 @@ import {
   LogBatch, LogSingle, isObject, safeJsonStringify,
 } from '../utils';
 import { ILogEntry, LogBody, LogSeverity } from './gcp-logging-types';
-import { LevelType } from '../local-types';
+import { GcpLoggerService, LevelType } from '../local-types';
 
 const url = 'https://logging.googleapis.com/v2/entries:write';
 
 let accessTokenCache: string | null | undefined = null;
-const getAccessToken = async (email: string, key: string) => {
+const getAccessToken = async (loggerService: GcpLoggerService) => {
   if (accessTokenCache) {
     return accessTokenCache;
   }
   const scopes = ['https://www.googleapis.com/auth/logging.write'];
   const jwtClient = new JWT({
-    email,
-    key,
+    email: loggerService.email,
+    key: loggerService.key,
     scopes,
   });
   const accessToken = await jwtClient.authorize();
@@ -45,25 +45,21 @@ const getLogSeverity = (level?: LevelType): LogSeverity => {
 interface LogOptions {
   tag: string;
   logObj: any[];
+  serviceCredentials: GcpLoggerService;
 }
 
 const log = async (options: LogOptions, firstCall = true):
  Promise<Record<string, unknown>> => {
   const {
     logObj,
+    serviceCredentials,
     tag,
   } = options;
   const {
-    GCP_LOGGER_EMAIL: email,
-    GCP_LOGGER_PRIVATE_KEY: key,
-    GCP_LOGGER_PROJECT_ID: projectId,
-  } = process.env;
+    projectId,
+  } = serviceCredentials;
 
-  if (!email || !key) {
-    throw new Error('GCP_LOGGER_EMAIL and GCP_LOGGER_PRIVATE_KEY must be set');
-  }
-
-  const accessToken = await getAccessToken(email, key);
+  const accessToken = await getAccessToken(serviceCredentials);
 
   const entries: ILogEntry[] = logObj.map((jsonPayload) => ({
     jsonPayload,
@@ -106,7 +102,7 @@ const log = async (options: LogOptions, firstCall = true):
   return json;
 };
 
-export const logSingle: LogSingle = (options) => {
+const logSingleSetup = (serviceCredentials: GcpLoggerService) : LogSingle => async (options) => {
   const { logObj } = options;
   if (!isObject(logObj)) {
     // eslint-disable-next-line no-console
@@ -117,10 +113,11 @@ export const logSingle: LogSingle = (options) => {
   return log({
     ...options,
     logObj: [logObj],
+    serviceCredentials,
   });
 };
 
-export const logBatch: LogBatch = async (options) => {
+const logBatchSetup = (serviceCredentials: GcpLoggerService): LogBatch => async (options) => {
   const { logObj } = options;
   if (!Array.isArray(logObj)) {
     // eslint-disable-next-line no-console
@@ -131,6 +128,7 @@ export const logBatch: LogBatch = async (options) => {
   return log({
     ...options,
     logObj,
+    serviceCredentials,
   });
 };
 
@@ -138,7 +136,7 @@ export const forTest = {
   log,
 };
 
-export const gcpLoggers = {
-  logBatch,
-  logSingle,
-};
+export const gcpLoggers = (serviceCredentials: GcpLoggerService) => ({
+  logBatch: logBatchSetup(serviceCredentials),
+  logSingle: logSingleSetup(serviceCredentials),
+});

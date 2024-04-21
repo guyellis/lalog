@@ -3,10 +3,17 @@ import { Request, Response } from 'express';
 
 import Logger from '../../../lib';
 import {
-  logSingle, logBatch,
+  logglyLoggers,
 } from '../../../lib/loggly/loggly-wrapper';
-import { LogData, ParseReqIn, ResponseWrapper } from '../../../lib/local-types';
+import {
+  LogData, LogglyLoggerService, ParseReqIn, ResponseWrapper,
+} from '../../../lib/local-types';
 import { LogBatchOptions, LogSingleOptions } from '../../../lib/utils';
+
+const serviceCredentials: LogglyLoggerService = {
+  type: 'loggly',
+};
+const { logBatch, logSingle } = logglyLoggers(serviceCredentials);
 
 jest.mock('node-fetch');
 

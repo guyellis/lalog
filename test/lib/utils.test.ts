@@ -1,4 +1,4 @@
-import { logDataEnriched, LogDataOut } from '../../lib/local-types';
+import { GcpLoggerService, logDataEnriched, LogDataOut } from '../../lib/local-types';
 import {
   enrichError, getLoggerService, isObject, safeJsonStringify,
 } from '../../lib/utils';
@@ -114,7 +114,14 @@ describe('utils', () => {
   });
 
   test('getLoggerService gets gcp loggers', async () => {
-    expect(getLoggerService('gcp')).toMatchInlineSnapshot(`
+    const serviceCredentials: GcpLoggerService = {
+      email: 'email',
+      key: 'key',
+      projectId: 'projectId',
+      type: 'gcp',
+    };
+
+    expect(getLoggerService(serviceCredentials)).toMatchInlineSnapshot(`
 {
   "logBatch": [Function],
   "logSingle": [Function],
@@ -123,6 +130,12 @@ describe('utils', () => {
   });
 
   test('getLoggerService throws for invalid', async () => {
-    expect(() => getLoggerService(('fake' as 'loggly'))).toThrowErrorMatchingInlineSnapshot('"invalid logger service"');
+    const serviceCredentials: GcpLoggerService = {
+      email: 'email',
+      key: 'key',
+      projectId: 'projectId',
+      type: 'fake' as unknown as 'gcp',
+    };
+    expect(() => getLoggerService(serviceCredentials)).toThrowErrorMatchingInlineSnapshot('"invalid logger service"');
   });
 });

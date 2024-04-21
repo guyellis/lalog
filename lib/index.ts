@@ -72,7 +72,7 @@ export default class Logger {
       ...(isObject(presets) ? presets : {}),
     };
 
-    this.loggerServices = (loggerServices || ['loggly']).map(getLoggerService);
+    this.loggerServices = (loggerServices || [{ type: 'loggly' }]).map(getLoggerService);
 
     if (addTrackId && !this.presets.trackId) {
       this.presets.trackId = randomUUID();

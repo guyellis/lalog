@@ -8,15 +8,18 @@ interface LogOptions {
   tag: string;
   logglyToken?: string;
   logObj: string;
-  serviceCredentials?: LogglyLoggerService;
+  serviceCredentials: LogglyLoggerService;
 }
 
 const log = async (options: LogOptions, bulk: boolean): Promise<Record<string, unknown>> => {
   const {
     tag,
-    logglyToken = process.env.LOGGLY_TOKEN,
     logObj: body,
   } = options;
+
+  const logglyToken = options.serviceCredentials.logglyToken
+    || options.logglyToken
+    || process.env.LOGGLY_TOKEN;
 
   const pathPart = bulk ? 'bulk' : 'inputs';
 

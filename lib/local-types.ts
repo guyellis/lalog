@@ -19,7 +19,7 @@ export interface GcpLoggerService {
 }
 
 export interface LogglyLoggerService {
-  // logglyToken?: string;
+  logglyToken?: string;
   type: 'loggly';
 }
 

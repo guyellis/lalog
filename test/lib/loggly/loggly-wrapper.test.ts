@@ -22,6 +22,15 @@ const logger = Logger.create({
   serviceName: 'test-service',
 });
 
+const loggerWithServiceCredentials = Logger.create({
+  loggerServices: [{
+    logglyToken: 'test-loggly-token',
+    type: 'loggly',
+  }],
+  moduleName: 'test-logger',
+  serviceName: 'test-service',
+});
+
 // Assign console to an object to check calls to console and suppress
 // console to stdout
 global.console = {} as Console;
@@ -439,11 +448,17 @@ describe('/lib/loggly/loggly-wrapper', () => {
 
   test('should not call fetch() if LOGGLY_TOKEN has not been defined', async () => {
     delete process.env.LOGGLY_TOKEN;
-    // const logger2 = Logger.create('test-service-2', 'test-logger-2');
     await logger.error({});
     expect(fetch).not.toHaveBeenCalled();
     expect(consoleWarn).toHaveBeenCalledTimes(1);
     expect(consoleWarn).toHaveBeenLastCalledWith('loggly token has not been defined');
+  });
+
+  test('should call fetch() if LOGGLY_TOKEN has not been defined and logger service token is defined', async () => {
+    delete process.env.LOGGLY_TOKEN;
+    await loggerWithServiceCredentials.error({});
+    expect(fetch).toHaveBeenCalled();
+    expect(consoleWarn).not.toHaveBeenCalled();
   });
 
   test('should create a transient logger', async () => {

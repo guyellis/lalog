@@ -7,7 +7,7 @@ import {
 import { LogBatchOptions, LogSingleOptions } from '../../../lib/utils';
 import { logSeverity } from '../../../lib/gcp/gcp-logging-types';
 
-const { getAccessToken, getLogSeverity, log } = forTest;
+const { getAccessToken, getLogSeverity } = forTest;
 
 const serviceCredentials: GcpLoggerService = {
   email: 'email',
@@ -62,23 +62,94 @@ describe('/lib/gcp/gcp-wrapper', () => {
     expect(consoleError).toHaveBeenCalledTimes(1);
   });
 
-  // eslint-disable-next-line jest/no-disabled-tests
-  test.skip('placeholder for log', async () => {
-    const actual = await log({
-      logObj: [{ one: 'logObject' }],
-      serviceCredentials,
-      tag: 'tag',
+  test('basic single log', async () => {
+    Logger.setLevel('info');
+    const logger = Logger.create({
+      loggerServices: [serviceCredentials],
     });
-    expect(actual).toMatchInlineSnapshot(`
+    const originalFetch = global.fetch;
+    global.fetch = jest.fn((url, options) => {
+      expect(url).toMatchInlineSnapshot('"https://logging.googleapis.com/v2/entries:write"');
+      expect(options).toMatchInlineSnapshot(`
 {
-  "bulk": false,
-  "options": {
-    "logObj": "logObject",
-    "logglyToken": "loggly token",
-    "tag": "tag",
+  "body": "{"entries":[{"jsonPayload":{"logData":{"one":"logObject"},"level":"info"},"severity":"INFO"}],"logName":"/projects/projectId/logs/undefined-development","resource":{"type":"global"}}",
+  "headers": {
+    "Authorization": "Bearer fake-access-token",
+    "Content-Type": "application/json",
   },
+  "method": "POST",
 }
 `);
+      return Promise.resolve(
+        new Response(JSON.stringify({ good: 'result' })),
+      );
+    });
+
+    const logInfoResult = await logger.info({
+      logData: {
+        one: 'logObject',
+      },
+    });
+    expect(logInfoResult).toMatchInlineSnapshot('undefined');
+
+    global.fetch = originalFetch;
+  });
+
+  test('basic batch log', async () => {
+    Logger.setLevel('warn');
+    const logger = Logger.create({
+      isTransient: true,
+      loggerServices: [serviceCredentials],
+    });
+    const originalFetch = global.fetch;
+    global.fetch = jest.fn(() => Promise.resolve(
+      new Response(JSON.stringify({ good: 'result' })),
+    ));
+
+    const logInfoResult = await logger.info({
+      logData: {
+        one: 'logObject',
+      },
+    });
+    const logErrorResult = await logger.error({
+      logData: {
+        one: 'logObject',
+      },
+    });
+
+    expect(logInfoResult).toMatchInlineSnapshot('undefined');
+    expect(logErrorResult).toMatchInlineSnapshot('undefined');
+
+    global.fetch = originalFetch;
+  });
+
+  test('Failed authentication should call twice and console.error', async () => {
+    Logger.setLevel('info');
+    const logger = Logger.create({
+      loggerServices: [serviceCredentials],
+    });
+    const originalFetch = global.fetch;
+    global.fetch = jest.fn(() => Promise.resolve(
+      new Response(JSON.stringify({
+        mock: 'response',
+      }), {
+        status: 401,
+        statusText: 'Unauthorized',
+      }),
+    ));
+
+    const logInfoResult = await logger.info({
+      logData: {
+        one: 'logObject',
+      },
+    });
+    expect(logInfoResult).toMatchInlineSnapshot('undefined');
+    // It recursively calls the log method so fetch gets called twice and only
+    // on the 2nd 401 does console.error() get called.
+    expect(global.fetch).toHaveBeenCalledTimes(2);
+    expect(consoleError).toHaveBeenCalledTimes(1);
+
+    global.fetch = originalFetch;
   });
 
   /**

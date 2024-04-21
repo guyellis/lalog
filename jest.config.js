@@ -16,7 +16,6 @@ module.exports = {
     '<rootDir>/dist/',
     '<rootDir>/node_modules/',
     '<rootDir>/test/',
-    '<rootDir>/lib/gcp/',
   ],
   coverageThreshold: {
     global: {

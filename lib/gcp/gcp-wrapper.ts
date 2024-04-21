@@ -135,7 +135,6 @@ const logBatchSetup = (serviceCredentials: GcpLoggerService): LogBatch => async 
 export const forTest = {
   getAccessToken,
   getLogSeverity,
-  log,
 };
 
 export const gcpLoggers = (serviceCredentials: GcpLoggerService) => ({

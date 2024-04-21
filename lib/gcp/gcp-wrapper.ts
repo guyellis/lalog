@@ -2,7 +2,8 @@ import { JWT } from 'google-auth-library';
 import {
   LogBatch, LogSingle, isObject, safeJsonStringify,
 } from '../utils';
-import { ILogEntry, LogBody } from './gcp-logging-types';
+import { ILogEntry, LogBody, LogSeverity } from './gcp-logging-types';
+import { LevelType } from '../local-types';
 
 const url = 'https://logging.googleapis.com/v2/entries:write';
 
@@ -15,6 +16,25 @@ const getAccessToken = async (email: string, key: string) => {
   });
   const accessToken = await jwtClient.authorize();
   return accessToken.access_token;
+};
+
+const getLogSeverity = (level?: LevelType): LogSeverity => {
+  switch (level) {
+    case 'trace':
+      return 'DEBUG';
+    case 'info':
+      return 'INFO';
+    case 'warn':
+      return 'WARNING';
+    case 'error':
+      return 'ERROR';
+    case 'fatal':
+      return 'ALERT';
+    case 'security':
+      return 'WARNING';
+    default:
+      return 'DEFAULT';
+  }
 };
 
 interface LogOptions {
@@ -42,6 +62,7 @@ const log = async (options: LogOptions):
 
   const entries: ILogEntry[] = logObj.map((jsonPayload) => ({
     jsonPayload,
+    severity: getLogSeverity(jsonPayload.level),
   }));
 
   const logBody: LogBody = {

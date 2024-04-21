@@ -14,7 +14,7 @@ export interface IMonitoredResource {
   labels?: ({ [k: string]: string }|null);
 }
 
-const LogSeverity = {
+const logSeverity = {
   ALERT: 700,
   CRITICAL: 600,
   DEBUG: 100,
@@ -24,7 +24,9 @@ const LogSeverity = {
   INFO: 200,
   NOTICE: 300,
   WARNING: 400,
-};
+} as const;
+
+export type LogSeverity = keyof typeof logSeverity;
 
 export interface ILogEntry {
 
@@ -50,7 +52,7 @@ export interface ILogEntry {
   // receiveTimestamp?: (google.protobuf.ITimestamp|null);
 
   /** LogEntry severity */
-  severity?: keyof typeof LogSeverity;
+  severity?: LogSeverity;
 
   /** LogEntry insertId */
   insertId?: (string|null);

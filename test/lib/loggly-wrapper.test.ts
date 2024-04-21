@@ -3,9 +3,10 @@ import { Request, Response } from 'express';
 
 import Logger from '../../lib';
 import {
-  logSingle, logBatch, LogSingleOptions, LogBatchOptions,
-} from '../../lib/loggly-wrapper';
+  logSingle, logBatch,
+} from '../../lib/loggly/loggly-wrapper';
 import { LogData, ParseReqIn, ResponseWrapper } from '../../lib/local-types';
+import { LogBatchOptions, LogSingleOptions } from '../../lib/utils';
 
 jest.mock('node-fetch');
 
@@ -268,7 +269,7 @@ describe('/lib/loggly-wrapper', () => {
     });
 
     const result = await logger.info(req);
-    expect(result).toEqual({});
+    expect(result).toBeUndefined();
     expect(fetch).toHaveBeenCalledTimes(1);
     expect(consoleError).toHaveBeenCalledTimes(1);
   });
@@ -416,7 +417,7 @@ describe('/lib/loggly-wrapper', () => {
     fetchMock.mockResolvedValue(resp);
 
     const result = await logger.error(logData);
-    expect(result).toEqual({});
+    expect(result).toBeUndefined();
     expect(fetch).toHaveBeenCalledTimes(1);
     expect(consoleError).toHaveBeenCalledTimes(1);
 
@@ -426,7 +427,7 @@ describe('/lib/loggly-wrapper', () => {
     const [firstParam] = firstCallParams;
     expect(firstParam.startsWith('fetch() call failed with 500')).toBe(true);
     expect(firstParam).toContain('\nError');
-    expect(firstParam).toContain('lib/loggly-wrapper.ts');
+    expect(firstParam).toContain('lib/loggly/loggly-wrapper.ts');
   });
 
   test('should not call fetch() if LOGGLY_TOKEN has not been defined', async () => {

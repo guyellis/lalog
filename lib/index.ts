@@ -1,10 +1,8 @@
 import { randomUUID } from 'crypto';
-import { enrichError, isObject } from './utils';
-
 import {
-  logBatch,
-  logSingle,
-} from './loggly-wrapper';
+  enrichError, getLoggerService, isObject, LogBatchOptions, LogSingleOptions,
+} from './utils';
+
 import {
   LaLogOptions, levels, LevelType, LogData, logDataEnriched, LogDataOut, LogFunction,
   LogPresets, ParseReqIn, ParseReqOut, ResponseWrapper, TimeLogFunction,
@@ -25,6 +23,8 @@ const getInitialLogLevel = (): number => {
 let currentLevelIndex = getInitialLogLevel();
 
 export default class Logger {
+  loggerServices: ReturnType<typeof getLoggerService>[];
+
   isTransient: boolean;
 
   logCollector: any[] | null;
@@ -56,10 +56,11 @@ export default class Logger {
   constructor(options: LaLogOptions) {
     const {
       addTrackId,
+      isTransient,
+      loggerServices,
       moduleName,
       presets,
       serviceName,
-      isTransient,
     } = options;
 
     this.isTransient = !!isTransient;
@@ -70,6 +71,8 @@ export default class Logger {
       module: moduleName,
       ...(isObject(presets) ? presets : {}),
     };
+
+    this.loggerServices = (loggerServices || ['loggly']).map(getLoggerService);
 
     if (addTrackId && !this.presets.trackId) {
       this.presets.trackId = randomUUID();
@@ -240,11 +243,17 @@ export default class Logger {
         if (levelIndex >= currentLevelIndex) {
           // Need to batch log here
           this.isTransientTriggered = true;
-          await logBatch({ logObj: this.logCollector, tag: this.tag });
+          const loggingObject: LogBatchOptions = { logObj: this.logCollector, tag: this.tag };
+          await Promise.all(this.loggerServices.map(
+            (loggerService) => loggerService.logBatch(loggingObject),
+          ));
           this.logCollector = null; // Can GC right away now that this array is no longer needed
         }
       } else {
-        return logSingle({ logObj, tag: this.tag });
+        const loggingObject: LogSingleOptions = { logObj, tag: this.tag };
+        await Promise.all(this.loggerServices.map(
+          (loggerService) => loggerService.logSingle(loggingObject),
+        ));
       }
     }
     return Promise.resolve();

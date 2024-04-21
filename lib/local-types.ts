@@ -7,17 +7,21 @@ export const levels = ['trace', 'info', 'warn', 'error', 'fatal', 'security'] as
 export type LevelType = typeof levels[number];
 
 export interface LogPresets extends Record<string, unknown> {
-    module?: string;
-    trackId?: string;
-  }
+  module?: string;
+  trackId?: string;
+}
+
+const loggerServices = ['loggly', 'gcp'] as const;
+export type LoggerService = typeof loggerServices[number];
 
 export interface LaLogOptions {
-    addTrackId?: boolean;
-    moduleName?: string;
-    presets?: LogPresets;
-    serviceName?: string;
-    isTransient?: boolean;
-  }
+  addTrackId?: boolean;
+  moduleName?: string;
+  presets?: LogPresets;
+  serviceName?: string;
+  isTransient?: boolean;
+  loggerServices?: LoggerService[];
+}
 
 export type ParseReqIn = Request & { user?: unknown };
 export type ParseReqOut = Pick<ParseReqIn, 'body' |

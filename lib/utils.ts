@@ -1,4 +1,8 @@
-import { logDataEnriched, LogDataOut } from './local-types';
+import { logDataEnriched, LogDataOut, LoggerService } from './local-types';
+import {
+  logBatch as logglyLogBatch,
+  logSingle as logglyLogSingle,
+} from './loggly/loggly-wrapper';
 
 export const isObject = (
   obj?: Record<string, unknown> | null,
@@ -62,4 +66,36 @@ export const enrichError = (body: LogDataOut): logDataEnriched | LogDataOut => {
   }
 
   return body;
+};
+
+export interface LogBatchOptions {
+  tag: string;
+  logglyToken?: string;
+  logObj: any[];
+}
+export type LogBatch = (
+  options: LogBatchOptions,
+) => Promise<Record<string, unknown> | void>;
+
+export interface LogSingleOptions {
+  tag: string;
+  logglyToken?: string;
+  logObj: any;
+}
+export type LogSingle = (
+  options: LogSingleOptions,
+) => Promise<Record<string, unknown> | void>;
+
+export const getLoggerService = (loggerService: LoggerService) => {
+  switch (loggerService) {
+    case 'gcp':
+      throw new Error('gcp logger service not implemented');
+    case 'loggly':
+      return {
+        logBatch: logglyLogBatch,
+        logSingle: logglyLogSingle,
+      };
+    default:
+      throw new Error('invalid logger service');
+  }
 };

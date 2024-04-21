@@ -1,5 +1,7 @@
 import fetch, { RequestInit, Response } from 'node-fetch';
-import { isObject, safeJsonStringify } from './utils';
+import {
+  LogBatch, LogSingle, isObject, safeJsonStringify,
+} from '../utils';
 
 interface LogOptions {
   tag: string;
@@ -58,15 +60,7 @@ options: ${safeJsonStringify(fetchOptions as Record<string, unknown>)}`);
   return {};
 };
 
-export interface LogSingleOptions {
-  tag: string;
-  logglyToken?: string;
-  logObj: any;
-}
-
-export const logSingle = (
-  options: LogSingleOptions,
-): Promise<Record<string, unknown> | void> => {
+export const logSingle: LogSingle = (options) => {
   const { logObj } = options;
   if (!isObject(logObj)) {
     // eslint-disable-next-line no-console
@@ -81,15 +75,7 @@ export const logSingle = (
   }, false);
 };
 
-export interface LogBatchOptions {
-  tag: string;
-  logglyToken?: string;
-  logObj: any[];
-}
-
-export const logBatch = async (
-  options: LogBatchOptions,
-): Promise<Record<string, unknown> | void> => {
+export const logBatch: LogBatch = async (options) => {
   const { logObj } = options;
   if (!Array.isArray(logObj)) {
     // eslint-disable-next-line no-console

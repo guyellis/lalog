@@ -1,5 +1,7 @@
 import { logDataEnriched, LogDataOut } from '../../lib/local-types';
-import { enrichError, isObject, safeJsonStringify } from '../../lib/utils';
+import {
+  enrichError, getLoggerService, isObject, safeJsonStringify,
+} from '../../lib/utils';
 
 describe('utils', () => {
   test('isObject', () => {
@@ -109,5 +111,13 @@ describe('utils', () => {
   "url": "some-url",
 }
 `);
+  });
+
+  test('getLoggerService throw for unimplemented', async () => {
+    expect(() => getLoggerService('gcp')).toThrowErrorMatchingInlineSnapshot('"gcp logger service not implemented"');
+  });
+
+  test('getLoggerService throws for invalid', async () => {
+    expect(() => getLoggerService(('fake' as 'loggly'))).toThrowErrorMatchingInlineSnapshot('"invalid logger service"');
   });
 });

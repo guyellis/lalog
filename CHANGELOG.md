@@ -1,5 +1,10 @@
 # Changelog
 
+### 3.1.0 (2024-04-21)
+
+- Feature
+  - Add GCP Cloud Logger service
+
 ### 3.0.0 (2023-11-21)
 
 - Breaking

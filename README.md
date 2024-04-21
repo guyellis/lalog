@@ -47,10 +47,12 @@ will immediately change the level for any loggers that have been created.
 
 ```javascript
 const logger = Logger.create({
-  serviceName: 'service-name',
+  addTrackId: true, // optional - defaults to false
+  isTransient: true, // optional - defaults to false
+  loggerServices: [/* see examples */],
   moduleName: 'module-name',
-  presets: {}, // optional
-  addTrackId: true, // options
+  presets: {}, // optional - defaults to empty object if missing or not a valid object
+  serviceName: 'service-name',
 });
 ```
 
@@ -58,19 +60,23 @@ or
 
 ```javascript
 const logger = new Logger({
-  serviceName: 'service-name',
-  moduleName: 'module-name',
-  presets: {}, // optional - defaults to empty object if missing or not a valid object
   addTrackId: true, // optional - defaults to false
   isTransient: true, // optional - defaults to false
+  loggerServices: [/* see examples */],
+  moduleName: 'module-name',
+  presets: {}, // optional - defaults to empty object if missing or not a valid object
+  serviceName: 'service-name',
 });
 ```
 
-Notes on create:
+Notes on create options:
 
-- `presets` is an optional object that will have its contents merged with any object that's logged. Useful for putting in data that you want logged with every message.
+#### `addTrackId`
+
 - If `addTrackId` is truthy then a `trackId` (uuid) will be added to `presets`.
-- The `moduleName` is added to `presets` as `module`.
+
+#### `isTransient`
+
 - If `isTransient` is set to true then all calls to logger will be saved and written in batch mode, in
 sequence, to the destination if any of the log calls triggers a write. This flag is called `isTransient`
 because typically you will only use it for short lived transient loggers. The typical use case is when
@@ -78,7 +84,7 @@ you attach a logger to the `req`/`request` object in a web request. You would th
 logger with trace, info and warn calls that would not be written if your level is set to `error`. If
 `error()` is called you would also want all the previous logs to be written so that you can see what
 happened before the `error()` was called. The `isTransient` flag causes the logger to store all of 
-those logs and write then in this scenario.
+those logs and write them in this scenario.
   - More notes on `isTransient`
   - You would almost always want to also set `trackId` to `true` when you set `isTransient` to `true`
   so that you can easily find/filter the associated log messages.
@@ -87,6 +93,48 @@ those logs and write then in this scenario.
   destination.
   - Possible future feature is to provide a maximum number of log messages to
   accumulate if `isTransient` is set.
+
+#### `loggerServices`
+
+To keep this backward compatible, `loggerServices defaults to:
+
+```javascript
+[{
+  type: 'loggly'
+}]
+```
+
+This maintains the original Loggly functionality as it was.
+
+If specified, this should be a 1 or 2 element array with one or both of these schemas:
+
+```typescript
+export interface GcpLoggerService {
+  email: string;
+  key: string;
+  projectId: string;
+  type: 'gcp';
+}
+
+export interface LogglyLoggerService {
+  logglyToken?: string;
+  type: 'loggly';
+}
+```
+
+For the GCP Cloud Logging service you will need to follow the ideas in the [GCP Cloud Logging](docs/gcp-cloud-logging.md) guide to set these values up.
+
+#### `moduleName`
+
+- The `moduleName` is added to `presets` as `module`.
+
+#### `presets`
+
+- `presets` is an optional object that will have its contents merged with any object that's logged. Useful for putting in data that you want logged with every message.
+
+#### `serviceName`
+
+- The `serviceName` is recorded with the log
 
 ### Write Log Messages
 

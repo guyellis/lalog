@@ -27,11 +27,11 @@ export type LoggerService = GcpLoggerService | LogglyLoggerService;
 
 export interface LaLogOptions {
   addTrackId?: boolean;
+  isTransient?: boolean;
+  loggerServices?: LoggerService[];
   moduleName?: string;
   presets?: LogPresets;
   serviceName?: string;
-  isTransient?: boolean;
-  loggerServices?: LoggerService[];
 }
 
 export type ParseReqIn = Request & { user?: unknown };

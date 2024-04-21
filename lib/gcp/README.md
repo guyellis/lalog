@@ -1,2 +1,0 @@
-# GCP Logging Notes
-

@@ -7,7 +7,11 @@ import { LevelType } from '../local-types';
 
 const url = 'https://logging.googleapis.com/v2/entries:write';
 
+let accessTokenCache: string | null | undefined = null;
 const getAccessToken = async (email: string, key: string) => {
+  if (accessTokenCache) {
+    return accessTokenCache;
+  }
   const scopes = ['https://www.googleapis.com/auth/logging.write'];
   const jwtClient = new JWT({
     email,
@@ -15,7 +19,8 @@ const getAccessToken = async (email: string, key: string) => {
     scopes,
   });
   const accessToken = await jwtClient.authorize();
-  return accessToken.access_token;
+  accessTokenCache = accessToken.access_token;
+  return accessTokenCache;
 };
 
 const getLogSeverity = (level?: LevelType): LogSeverity => {
@@ -42,7 +47,7 @@ interface LogOptions {
   logObj: any[];
 }
 
-const log = async (options: LogOptions):
+const log = async (options: LogOptions, firstCall = true):
  Promise<Record<string, unknown>> => {
   const {
     logObj,
@@ -83,6 +88,18 @@ const log = async (options: LogOptions):
     },
     method: 'POST',
   });
+
+  // If we get 401 Unauthorized it might be because the token has expired so
+  // we try once more.
+  if (result.status === 401) {
+    accessTokenCache = null;
+    if (firstCall) {
+      return log(options, false);
+    }
+    // eslint-disable-next-line no-console
+    console.error(`fetch status is 401: ${result.statusText}`);
+    return {};
+  }
 
   const json = await result.json();
 

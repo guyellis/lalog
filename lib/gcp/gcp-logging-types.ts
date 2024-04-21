@@ -14,7 +14,10 @@ export interface IMonitoredResource {
   labels?: ({ [k: string]: string }|null);
 }
 
-const logSeverity = {
+/**
+ * This is only exported for code coverage.
+ */
+export const logSeverity = {
   ALERT: 700,
   CRITICAL: 600,
   DEBUG: 100,

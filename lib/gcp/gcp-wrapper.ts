@@ -18,8 +18,8 @@ const getAccessToken = async (loggerService: GcpLoggerService) => {
     key: loggerService.key,
     scopes,
   });
-  const accessToken = await jwtClient.authorize();
-  accessTokenCache = accessToken.access_token;
+  const credentials = await jwtClient.authorize();
+  accessTokenCache = credentials.access_token;
   return accessTokenCache;
 };
 
@@ -133,6 +133,8 @@ const logBatchSetup = (serviceCredentials: GcpLoggerService): LogBatch => async 
 };
 
 export const forTest = {
+  getAccessToken,
+  getLogSeverity,
   log,
 };
 

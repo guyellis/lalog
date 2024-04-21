@@ -38,6 +38,20 @@
     "internalConsoleOptions": "neverOpen",
     "runtimeVersion": "20.9.0",
     "skipFiles": ["<node_internals>/**/*.js"]
+  },
+  {
+    "name": "TS Script (this file)",
+    "type": "node",
+    "request": "launch",
+    "cwd": "${workspaceFolder}",
+    "args": ["${relativeFile}"],
+    "sourceMaps": true,
+    "env": {
+      "NODE_ENV": "development",
+      "TS_NODE_FILES": "true"
+    },
+    "runtimeVersion": "20.9.0",
+    "runtimeArgs": ["--nolazy", "-r", "ts-node/register"]
   }
 ]
 }

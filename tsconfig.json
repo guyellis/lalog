@@ -15,7 +15,8 @@
     "target": "ES2017"
   },
   "include": [
-    "lib/**/*"
+    "lib/**/*",
+    "gcp-testing/gcp-tester.ts"
   ],
   "exclude": [
     "node_modules"

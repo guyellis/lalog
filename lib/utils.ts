@@ -1,6 +1,6 @@
 import { logDataEnriched, LogDataOut, LoggerService } from './local-types';
 import { logglyLoggers } from './loggly/loggly-wrapper';
-import { gcpLoggers } from './gcp/gcp-wrapper-copy';
+import { gcpLoggers } from './gcp/gcp-wrapper';
 
 export const isObject = (
   obj?: Record<string, unknown> | null,

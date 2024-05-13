@@ -4,7 +4,7 @@
     "url": "https://github.com/guyellis/lalog/issues"
   },
   "dependencies": {
-    "google-auth-library": "9.9.0",
+    "google-auth-library": "9.10.0",
     "node-fetch": "2.7.0"
   },
   "description": "Logging aggregation and distribution",

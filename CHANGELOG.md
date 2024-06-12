@@ -1,5 +1,10 @@
 # Changelog
 
+### 3.1.1 (2024-04-21)
+
+- Fix
+  - Update the TypeScript Types
+
 ### 3.1.0 (2024-04-21)
 
 - Feature

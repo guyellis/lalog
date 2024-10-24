@@ -10,7 +10,7 @@
   "description": "Logging aggregation and distribution",
   "devDependencies": {
     "@types/express": "5.0.0",
-    "@types/jest": "29.5.13",
+    "@types/jest": "29.5.14",
     "@types/node": "22.7.9",
     "@types/node-fetch": "2.6.9",
     "@typescript-eslint/eslint-plugin": "5.62.0",

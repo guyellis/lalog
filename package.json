@@ -25,7 +25,7 @@
     "pre-commit": "1.2.2",
     "ts-jest": "29.3.1",
     "ts-node": "10.9.2",
-    "typescript": "5.8.2"
+    "typescript": "5.8.3"
   },
   "homepage": "https://github.com/guyellis/lalog#readme",
   "keywords": [

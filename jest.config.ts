@@ -1,7 +1,8 @@
+import type { Config } from 'jest';
+
 const collectCoverage = !process.env.SKIP_COVERAGE;
 
-/** @type {jest.InitialOptions} */
-module.exports = {
+const config: Config = {
   collectCoverage,
   collectCoverageFrom: [
     '!**/.vscode/**',
@@ -36,3 +37,5 @@ module.exports = {
   },
   verbose: false,
 };
+
+export default config;

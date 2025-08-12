@@ -22,7 +22,7 @@ const getInitialLogLevel = (): number => {
 
 let currentLevelIndex = getInitialLogLevel();
 
-export default class Logger {
+export class Logger {
   loggerServices: ReturnType<typeof getLoggerService>[];
 
   isTransient: boolean;
@@ -259,3 +259,9 @@ export default class Logger {
     return Promise.resolve();
   }
 }
+
+export const createLogger = Logger.create;
+export const setLoggerLevel = Logger.setLevel;
+export const getLoggerLevel = Logger.getLevel;
+
+export default Logger;

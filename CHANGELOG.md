@@ -1,5 +1,10 @@
 # Changelog
 
+### 4.1.0 (2025-08-12)
+
+- Feature
+  - Explicit exports for create, setLevel, getLevel
+
 ### 4.0.0 (2025-08-12)
 
 - Breaking

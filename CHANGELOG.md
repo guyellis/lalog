@@ -1,5 +1,12 @@
 # Changelog
 
+### 4.0.0 (2025-08-12)
+
+- Breaking
+  - Upgrade Node.js from 20.x to 24.x
+- Fix
+  - Upgrade dependencies
+
 ### 3.1.1 (2024-04-21)
 
 - Fix

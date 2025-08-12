@@ -5,14 +5,14 @@
     "declaration": true,
     "esModuleInterop": true,
     "incremental": true,
-    "lib": ["es2019", "dom"],
+    "lib": ["ES2022", "dom"],
     "module": "commonjs",
     "noEmit": false,
     "outDir": "dist",
     "resolveJsonModule": false,
     "sourceMap": true,
     "strict": true,
-    "target": "ES2017"
+    "target": "es2022"
   },
   "include": [
     "lib/**/*"

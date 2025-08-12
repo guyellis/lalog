@@ -54,5 +54,5 @@
     "test": "npm run lint && npm run coverage && tsc"
   },
   "types": "dist/index.d.ts",
-  "version": "3.1.1"
+  "version": "4.0.0"
 }

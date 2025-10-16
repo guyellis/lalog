@@ -16,7 +16,6 @@
       "${relativeFile}"
     ],
     "console": "integratedTerminal",
-    "runtimeVersion": "24.5.0",
     "internalConsoleOptions": "neverOpen",
     "skipFiles": ["<node_internals>/**/*.js"]
   },
@@ -36,7 +35,6 @@
     ],
     "console": "integratedTerminal",
     "internalConsoleOptions": "neverOpen",
-    "runtimeVersion": "24.5.0",
     "skipFiles": ["<node_internals>/**/*.js"]
   },
   {
@@ -50,7 +48,6 @@
       "NODE_ENV": "development",
       "TS_NODE_FILES": "true"
     },
-    "runtimeVersion": "24.5.0",
     "runtimeArgs": ["--nolazy", "-r", "ts-node/register"]
   }
 ]

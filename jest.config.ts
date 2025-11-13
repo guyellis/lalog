@@ -31,6 +31,7 @@ const config: Config = {
     '<rootDir>/test/',
   ],
   setupFilesAfterEnv: ['./test/setup.ts'],
+  testEnvironment: 'node',
   testMatch: ['**/test/**/*.test.[t|j]s?(x)'],
   transform: {
     '.+\\.[j|t]sx?$': 'ts-jest',

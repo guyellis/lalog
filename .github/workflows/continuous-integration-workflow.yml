@@ -24,3 +24,4 @@ jobs:
     - run: npm test
       env:
         CI: true
+        NODE_OPTIONS: "--localstorage-file=/tmp/node-localstorage"

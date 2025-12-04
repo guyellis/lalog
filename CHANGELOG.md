@@ -1,5 +1,10 @@
 # Changelog
 
+### 4.2.0 (2025-12-04)
+
+- Feature
+  - Add static isStringAValidLogLevel() method
+
 ### 4.1.0 (2025-08-12)
 
 - Feature

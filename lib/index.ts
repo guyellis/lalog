@@ -116,6 +116,15 @@ export class Logger {
   }
 
   /**
+   * Check if a string is a valid log level
+   * @param level - a string to check if it is a valid log level
+   * @returns true if the string is a valid log level
+   */
+  static isStringAValidLogLevel(level: string): boolean {
+    return Logger.allLevels().includes(level as LevelType);
+  }
+
+  /**
    * Get the current log level
    */
   static getLevel(): LevelType {
@@ -263,5 +272,7 @@ export class Logger {
 export const createLogger = Logger.create;
 export const setLoggerLevel = Logger.setLevel;
 export const getLoggerLevel = Logger.getLevel;
+export const allLoggerLevels = Logger.allLevels;
+export const { isStringAValidLogLevel } = Logger;
 
 export default Logger;

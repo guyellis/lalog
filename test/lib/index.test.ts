@@ -1,4 +1,4 @@
-import Logger from '../../lib';
+import Logger, { isStringAValidLogLevel } from '../../lib';
 import { LevelType, ParseReqIn } from '../../lib/local-types';
 
 let loggerWrite = jest.fn();
@@ -207,5 +207,15 @@ describe('/lib/logger', () => {
     });
     expect(typeof testLogger).toBe('object');
     expect(testLogger.presets.trackId).toHaveLength(36);
+  });
+
+  test('should return true/false for isStringAValidLogLevel', () => {
+    expect(isStringAValidLogLevel('trace')).toBe(true);
+    expect(isStringAValidLogLevel('info')).toBe(true);
+    expect(isStringAValidLogLevel('warn')).toBe(true);
+    expect(isStringAValidLogLevel('error')).toBe(true);
+    expect(isStringAValidLogLevel('fatal')).toBe(true);
+    expect(isStringAValidLogLevel('security')).toBe(true);
+    expect(isStringAValidLogLevel('invalid')).toBe(false);
   });
 });

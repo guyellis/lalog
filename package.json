@@ -9,23 +9,25 @@
   },
   "description": "Logging aggregation and distribution",
   "devDependencies": {
+    "@eslint/js": "9.39.2",
+    "@stylistic/eslint-plugin": "5.10.0",
     "@types/express": "5.0.6",
     "@types/jest": "30.0.0",
     "@types/node": "25.5.2",
     "@types/node-fetch": "2.6.13",
-    "@typescript-eslint/eslint-plugin": "5.62.0",
-    "@typescript-eslint/parser": "5.62.0",
-    "eslint": "8.57.0",
-    "eslint-config-airbnb-base": "15.0.0",
+    "eslint": "9.39.2",
+    "eslint-config-prettier": "10.1.8",
     "eslint-plugin-import": "2.32.0",
-    "eslint-plugin-jest": "27.9.0",
-    "eslint-plugin-security": "1.7.1",
+    "eslint-plugin-prettier": "5.5.5",
     "eslint-plugin-sort-keys-fix": "1.1.2",
+    "globals": "17.4.0",
     "jest": "30.3.0",
     "pre-commit": "1.2.2",
+    "prettier": "3.8.1",
     "ts-jest": "29.4.9",
     "ts-node": "10.9.2",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.58.0"
   },
   "homepage": "https://github.com/guyellis/lalog#readme",
   "keywords": [
@@ -49,8 +51,8 @@
   "scripts": {
     "coverage": "jest --coverage",
     "coverage-view": "google-chrome coverage/lcov-report/index.html",
-    "lint": "eslint --ext .js --ext .ts . --max-warnings 0",
-    "lintfix": "npm run lint -- --fix",
+    "lint": "eslint . --max-warnings 0",
+    "lintfix": "eslint . --fix",
     "test": "npm run lint && npm run coverage && tsc"
   },
   "types": "dist/index.d.ts",

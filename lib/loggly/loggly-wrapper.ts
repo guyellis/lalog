@@ -1,8 +1,6 @@
 import fetch, { RequestInit, Response } from 'node-fetch';
-import {
-  LogBatch, LogSingle, isObject, safeJsonStringify,
-} from '../utils';
 import { LogglyLoggerService } from '../local-types';
+import { LogBatch, LogSingle, isObject, safeJsonStringify } from '../utils';
 
 interface LogOptions {
   tag: string;
@@ -12,14 +10,10 @@ interface LogOptions {
 }
 
 const log = async (options: LogOptions, bulk: boolean): Promise<Record<string, unknown>> => {
-  const {
-    tag,
-    logObj: body,
-  } = options;
+  const { tag, logObj: body } = options;
 
-  const logglyToken = options.serviceCredentials.logglyToken
-    || options.logglyToken
-    || process.env.LOGGLY_TOKEN;
+  const logglyToken =
+    options.serviceCredentials.logglyToken || options.logglyToken || process.env.LOGGLY_TOKEN;
 
   const pathPart = bulk ? 'bulk' : 'inputs';
 
@@ -41,7 +35,7 @@ const log = async (options: LogOptions, bulk: boolean): Promise<Record<string, u
 
       if (result.status !== 200) {
         const { stack } = new Error();
-        // eslint-disable-next-line no-console
+
         console.error(`fetch() call failed with ${result.status}\n${stack}`);
         return {};
       }
@@ -52,50 +46,58 @@ const log = async (options: LogOptions, bulk: boolean): Promise<Record<string, u
       // this istanbul ignore directive.
       /* istanbul ignore next */
       const err = error instanceof Error ? error : new Error('unknown');
-      // eslint-disable-next-line no-console
+
       console.error(`fetch() threw an error: ${err.message}
 url: ${url}
 options: ${safeJsonStringify(fetchOptions as Record<string, unknown>)}`);
       return {};
     }
   }
-  // eslint-disable-next-line no-console
+
   console.warn('loggly token has not been defined');
 
   return {};
 };
 
-const logSingleSetup = (serviceCredentials: LogglyLoggerService) : LogSingle => async (options) => {
-  const { logObj } = options;
-  if (!isObject(logObj)) {
-    // eslint-disable-next-line no-console
-    console.error(`Expected an Object in logSingle but got ${typeof logObj}`);
-    return Promise.resolve();
-  }
+const logSingleSetup =
+  (serviceCredentials: LogglyLoggerService): LogSingle =>
+  async (options) => {
+    const { logObj } = options;
+    if (!isObject(logObj)) {
+      console.error(`Expected an Object in logSingle but got ${typeof logObj}`);
+      return Promise.resolve();
+    }
 
-  const body = safeJsonStringify(logObj);
-  return log({
-    ...options,
-    logObj: body,
-    serviceCredentials,
-  }, false);
-};
+    const body = safeJsonStringify(logObj);
+    return log(
+      {
+        ...options,
+        logObj: body,
+        serviceCredentials,
+      },
+      false,
+    );
+  };
 
-const logBatchSetup = (serviceCredentials: LogglyLoggerService): LogBatch => async (options) => {
-  const { logObj } = options;
-  if (!Array.isArray(logObj)) {
-    // eslint-disable-next-line no-console
-    console.error(`Expected an Array in logBatch but got ${typeof logObj}`);
-    return Promise.resolve();
-  }
+const logBatchSetup =
+  (serviceCredentials: LogglyLoggerService): LogBatch =>
+  async (options) => {
+    const { logObj } = options;
+    if (!Array.isArray(logObj)) {
+      console.error(`Expected an Array in logBatch but got ${typeof logObj}`);
+      return Promise.resolve();
+    }
 
-  const body = logObj.map((logEntry) => safeJsonStringify(logEntry)).join('\n');
-  return log({
-    ...options,
-    logObj: body,
-    serviceCredentials,
-  }, true);
-};
+    const body = logObj.map((logEntry) => safeJsonStringify(logEntry)).join('\n');
+    return log(
+      {
+        ...options,
+        logObj: body,
+        serviceCredentials,
+      },
+      true,
+    );
+  };
 
 export const logglyLoggers = (serviceCredentials: LogglyLoggerService) => ({
   logBatch: logBatchSetup(serviceCredentials),

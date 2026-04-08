@@ -1,8 +1,8 @@
 import Logger, { isStringAValidLogLevel } from '../../lib';
-import { LevelType, ParseReqIn } from '../../lib/local-types';
+import { LevelType, LogData, ParseReqIn } from '../../lib/local-types';
 
 let loggerWrite = jest.fn();
-Logger.prototype.write = (levelIndex: number, logObject: any): Promise<any> => {
+Logger.prototype.write = (levelIndex: number, logObject: LogData): Promise<void> => {
   loggerWrite(levelIndex, logObject);
   return Promise.resolve();
 };
@@ -130,9 +130,7 @@ describe('/lib/logger', () => {
         const [lastCallParam1, lastCallParam2] = loggerWrite.mock.calls[0];
         expect(lastCallParam1).toBe(1);
 
-        const {
-          msg, other, timerLabel, duration,
-        } = lastCallParam2;
+        const { msg, other, timerLabel, duration } = lastCallParam2;
         expect(msg).toBe('Timer - fake-msg');
         expect(other).toBe('data');
         expect(timerLabel).toBe('time-label');

@@ -1,12 +1,25 @@
 import { randomUUID } from 'crypto';
 import {
-  enrichError, getLoggerService, isObject, LogBatchOptions, LogSingleOptions,
-} from './utils';
-
-import {
-  LaLogOptions, levels, LevelType, LogData, logDataEnriched, LogDataOut, LogFunction,
-  LogPresets, ParseReqIn, ParseReqOut, ResponseWrapper, TimeLogFunction,
+  LaLogOptions,
+  levels,
+  LevelType,
+  LogData,
+  logDataEnriched,
+  LogDataOut,
+  LogFunction,
+  LogPresets,
+  ParseReqIn,
+  ParseReqOut,
+  ResponseWrapper,
+  TimeLogFunction,
 } from './local-types';
+import {
+  enrichError,
+  getLoggerService,
+  isObject,
+  LogBatchOptions,
+  LogSingleOptions,
+} from './utils';
 
 export * from './local-types';
 
@@ -27,7 +40,7 @@ export class Logger {
 
   isTransient: boolean;
 
-  logCollector: any[] | null;
+  logCollector: (logDataEnriched | LogDataOut)[] | null;
 
   presets: LogPresets;
 
@@ -54,14 +67,7 @@ export class Logger {
   isTransientTriggered?: boolean;
 
   constructor(options: LaLogOptions) {
-    const {
-      addTrackId,
-      isTransient,
-      loggerServices,
-      moduleName,
-      presets,
-      serviceName,
-    } = options;
+    const { addTrackId, isTransient, loggerServices, moduleName, presets, serviceName } = options;
 
     this.isTransient = !!isTransient;
 
@@ -102,8 +108,8 @@ export class Logger {
   }
 
   /**
-    * Create an instance of Logger
-    */
+   * Create an instance of Logger
+   */
   static create(options: LaLogOptions): Logger {
     return new Logger(options);
   }
@@ -176,13 +182,13 @@ export class Logger {
   /**
    * Write the timer label end
    */
-  writeTimeEnd(label: string, level: LevelType, extraLogDat?: LogData): Promise<any> {
+  writeTimeEnd(label: string, level: LevelType, extraLogDat?: LogData): Promise<void> {
     const levelIndex = levels.indexOf(level);
     const extraLogData = extraLogDat || {};
     const time = this.timers[label];
     const duration = Object.prototype.hasOwnProperty.call(this.timers, label)
       ? Logger.formatMilliseconds(Date.now() - time)
-      : `Missing label "${label}" in timeEnd()\n${(new Error()).stack}`;
+      : `Missing label "${label}" in timeEnd()\n${new Error().stack}`;
 
     let { msg } = extraLogData;
     msg = msg ? `Timer - ${msg}` : 'Timer';
@@ -199,9 +205,8 @@ export class Logger {
   /**
    * Write log to destination
    */
-  async write(levelIndex: number, logData: LogData, response?: ResponseWrapper): Promise<any> {
+  async write(levelIndex: number, logData: LogData, response?: ResponseWrapper): Promise<void> {
     if (!isObject(logData)) {
-      // eslint-disable-next-line no-console
       console.error(`Expecting an object in logger write method but got "${typeof logData}"`);
       return Promise.resolve();
     }
@@ -253,16 +258,16 @@ export class Logger {
           // Need to batch log here
           this.isTransientTriggered = true;
           const loggingObject: LogBatchOptions = { logObj: this.logCollector, tag: this.tag };
-          await Promise.all(this.loggerServices.map(
-            (loggerService) => loggerService.logBatch(loggingObject),
-          ));
+          await Promise.all(
+            this.loggerServices.map((loggerService) => loggerService.logBatch(loggingObject)),
+          );
           this.logCollector = null; // Can GC right away now that this array is no longer needed
         }
       } else {
         const loggingObject: LogSingleOptions = { logObj, tag: this.tag };
-        await Promise.all(this.loggerServices.map(
-          (loggerService) => loggerService.logSingle(loggingObject),
-        ));
+        await Promise.all(
+          this.loggerServices.map((loggerService) => loggerService.logSingle(loggingObject)),
+        );
       }
     }
     return Promise.resolve();

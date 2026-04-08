@@ -1,11 +1,8 @@
 import { GcpLoggerService, logDataEnriched, LogDataOut } from '../../lib/local-types';
-import {
-  enrichError, getLoggerService, isObject, safeJsonStringify,
-} from '../../lib/utils';
+import { enrichError, getLoggerService, isObject, safeJsonStringify } from '../../lib/utils';
 
 describe('utils', () => {
   test('isObject', () => {
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
     const emptyArrow = (): void => {};
 
     expect(isObject({})).toBe(true);
@@ -136,6 +133,8 @@ describe('utils', () => {
       projectId: 'projectId',
       type: 'fake' as unknown as 'gcp',
     };
-    expect(() => getLoggerService(serviceCredentials)).toThrowErrorMatchingInlineSnapshot('"invalid logger service"');
+    expect(() => getLoggerService(serviceCredentials)).toThrowErrorMatchingInlineSnapshot(
+      '"invalid logger service"',
+    );
   });
 });

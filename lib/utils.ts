@@ -1,18 +1,17 @@
+import { gcpLoggers } from './gcp/gcp-wrapper';
 import { logDataEnriched, LogDataOut, LoggerService } from './local-types';
 import { logglyLoggers } from './loggly/loggly-wrapper';
-import { gcpLoggers } from './gcp/gcp-wrapper';
 
-export const isObject = (
-  obj?: Record<string, unknown> | null,
-): boolean => !!obj && obj.toString() === '[object Object]' && !Array.isArray(obj);
+export const isObject = (obj?: Record<string, unknown> | null): boolean =>
+  !!obj && obj.toString() === '[object Object]' && !Array.isArray(obj);
 
-type CircularReplacer = (key: any, value: any) => any;
+type CircularReplacer = (key: string, value: unknown) => unknown;
 
 // From MDN:
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Errors/Cyclic_object_value
 const getCircularReplacer = (): CircularReplacer => {
   const seen = new WeakSet();
-  return (key, value): any => {
+  return (key, value): unknown => {
     if (typeof value === 'object' && value !== null) {
       if (seen.has(value)) {
         return '[CIRCULAR]';
@@ -23,9 +22,8 @@ const getCircularReplacer = (): CircularReplacer => {
   };
 };
 
-export const safeJsonStringify = (
-  obj: Record<string, unknown>,
-): string => JSON.stringify(obj, getCircularReplacer());
+export const safeJsonStringify = (obj: Record<string, unknown>): string =>
+  JSON.stringify(obj, getCircularReplacer());
 
 const hasNodeModules = (i: string): boolean => !i.includes('/node_modules/');
 
@@ -38,16 +36,19 @@ export const enrichError = (body: LogDataOut): logDataEnriched | LogDataOut => {
   if (err) {
     const stack = err.stack
       ? err.stack
-      : /* istanbul ignore next */ new Error().stack ?? '<no error stack>';
+      : /* istanbul ignore next */ (new Error().stack ?? '<no error stack>');
     const fullStack = stack.split('\n').slice(1);
     const shortStack = fullStack.filter(hasNodeModules);
 
     let err2: Record<string, unknown> = {};
     if (err instanceof Error) {
-      err2 = Object.entries(err).reduce((acc, [k, v]) => {
-        acc[k] = v;
-        return acc;
-      }, {} as Record<string, unknown>);
+      err2 = Object.entries(err).reduce(
+        (acc, [k, v]) => {
+          acc[k] = v;
+          return acc;
+        },
+        {} as Record<string, unknown>,
+      );
       /* istanbul ignore next */
       err2.name = err.name ?? '<none>';
       err2.message = err.message;
@@ -69,20 +70,16 @@ export const enrichError = (body: LogDataOut): logDataEnriched | LogDataOut => {
 export interface LogBatchOptions {
   tag: string;
   logglyToken?: string;
-  logObj: any[];
+  logObj: (logDataEnriched | LogDataOut)[];
 }
-export type LogBatch = (
-  options: LogBatchOptions,
-) => Promise<Record<string, unknown> | void>;
+export type LogBatch = (options: LogBatchOptions) => Promise<Record<string, unknown> | void>;
 
 export interface LogSingleOptions {
   tag: string;
   logglyToken?: string;
-  logObj: any;
+  logObj: logDataEnriched | LogDataOut;
 }
-export type LogSingle = (
-  options: LogSingleOptions,
-) => Promise<Record<string, unknown> | void>;
+export type LogSingle = (options: LogSingleOptions) => Promise<Record<string, unknown> | void>;
 
 export const getLoggerService = (loggerService: LoggerService) => {
   switch (loggerService.type) {

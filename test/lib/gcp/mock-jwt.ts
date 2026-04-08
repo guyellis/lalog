@@ -1,5 +1,5 @@
 export class MockJwt {
-  payload: any;
+  payload: Record<string, unknown>;
 
   token: string;
 
@@ -9,7 +9,7 @@ export class MockJwt {
     this.token = 'fake-access-token';
   }
 
-  public authorize(): Promise<any> {
+  public authorize(): Promise<{ access_token: string }> {
     return Promise.resolve({
       access_token: this.token,
     });

@@ -1,11 +1,8 @@
 import fetch from 'node-fetch';
-import { MockJwt } from './mock-jwt';
 import Logger, { GcpLoggerService } from '../../../lib';
-import {
-  gcpLoggers, forTest,
-} from '../../../lib/gcp/gcp-wrapper';
-import { LogBatchOptions, LogSingleOptions } from '../../../lib/utils';
 import { logSeverity } from '../../../lib/gcp/gcp-logging-types';
+import { gcpLoggers, forTest } from '../../../lib/gcp/gcp-wrapper';
+import { LogBatchOptions, LogSingleOptions } from '../../../lib/utils';
 
 const { getAccessToken, getLogSeverity } = forTest;
 
@@ -19,9 +16,12 @@ const { logBatch, logSingle } = gcpLoggers(serviceCredentials);
 
 jest.mock('node-fetch');
 
-jest.mock('google-auth-library', () => ({
-  JWT: MockJwt,
-}));
+jest.mock('google-auth-library', () => {
+  const { MockJwt } = jest.requireActual('./mock-jwt');
+  return {
+    JWT: MockJwt,
+  };
+});
 
 // Assign console to an object to check calls to console and suppress
 // console to stdout
@@ -80,9 +80,7 @@ describe('/lib/gcp/gcp-wrapper', () => {
   "method": "POST",
 }
 `);
-      return Promise.resolve(
-        new Response(JSON.stringify({ good: 'result' })),
-      );
+      return Promise.resolve(new Response(JSON.stringify({ good: 'result' })));
     });
 
     const logInfoResult = await logger.info({
@@ -102,9 +100,7 @@ describe('/lib/gcp/gcp-wrapper', () => {
       loggerServices: [serviceCredentials],
     });
     const originalFetch = global.fetch;
-    global.fetch = jest.fn(() => Promise.resolve(
-      new Response(JSON.stringify({ good: 'result' })),
-    ));
+    global.fetch = jest.fn(() => Promise.resolve(new Response(JSON.stringify({ good: 'result' }))));
 
     const logInfoResult = await logger.info({
       logData: {
@@ -129,14 +125,19 @@ describe('/lib/gcp/gcp-wrapper', () => {
       loggerServices: [serviceCredentials],
     });
     const originalFetch = global.fetch;
-    global.fetch = jest.fn(() => Promise.resolve(
-      new Response(JSON.stringify({
-        mock: 'response',
-      }), {
-        status: 401,
-        statusText: 'Unauthorized',
-      }),
-    ));
+    global.fetch = jest.fn(() =>
+      Promise.resolve(
+        new Response(
+          JSON.stringify({
+            mock: 'response',
+          }),
+          {
+            status: 401,
+            statusText: 'Unauthorized',
+          },
+        ),
+      ),
+    );
 
     const logInfoResult = await logger.info({
       logData: {

@@ -1,13 +1,14 @@
-import fetch from 'node-fetch';
 import { Request, Response } from 'express';
+import fetch from 'node-fetch';
 
 import Logger from '../../../lib';
 import {
-  logglyLoggers,
-} from '../../../lib/loggly/loggly-wrapper';
-import {
-  LogData, LogglyLoggerService, ParseReqIn, ResponseWrapper,
+  LogData,
+  LogglyLoggerService,
+  ParseReqIn,
+  ResponseWrapper,
 } from '../../../lib/local-types';
+import { logglyLoggers } from '../../../lib/loggly/loggly-wrapper';
 import { LogBatchOptions, LogSingleOptions } from '../../../lib/utils';
 
 const serviceCredentials: LogglyLoggerService = {
@@ -23,10 +24,12 @@ const logger = Logger.create({
 });
 
 const loggerWithServiceCredentials = Logger.create({
-  loggerServices: [{
-    logglyToken: 'test-loggly-token',
-    type: 'loggly',
-  }],
+  loggerServices: [
+    {
+      logglyToken: 'test-loggly-token',
+      type: 'loggly',
+    },
+  ],
   moduleName: 'test-logger',
   serviceName: 'test-service',
 });
@@ -94,7 +97,9 @@ describe('/lib/loggly/loggly-wrapper', () => {
   "method": "POST",
 }
 `);
-    expect(logglyUrl).toMatchInlineSnapshot('"https://logs-01.loggly.com/inputs/test-loggly-token/tag/test-service-development/"');
+    expect(logglyUrl).toMatchInlineSnapshot(
+      '"https://logs-01.loggly.com/inputs/test-loggly-token/tag/test-service-development/"',
+    );
     expect(fetch).toHaveBeenCalledTimes(1);
   });
 
@@ -120,7 +125,7 @@ describe('/lib/loggly/loggly-wrapper', () => {
     fetchMock.mockResolvedValue(resp);
 
     await logger.error(logObj);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
     const [_logglyUrl, fetchOptions] = (fetch as unknown as jest.Mock).mock.calls[0];
     const body = JSON.parse(fetchOptions.body);
     delete body.err.fullStack;
@@ -174,11 +179,13 @@ describe('/lib/loggly/loggly-wrapper', () => {
 
       const originalDateNow = Date.now;
       let dateNowCallCounter = 0;
-      // eslint-disable-next-line no-plusplus
+
       Date.now = jest.fn(() => (dateNowCallCounter++ > 0 ? 5000 : 0));
 
-      fetchMock.mockImplementation((url: string, options: any) => {
-        expect(url).toBe('https://logs-01.loggly.com/inputs/test-loggly-token/tag/test-service-development/');
+      fetchMock.mockImplementation((url: string, options: { method: string; body: string }) => {
+        expect(url).toBe(
+          'https://logs-01.loggly.com/inputs/test-loggly-token/tag/test-service-development/',
+        );
         expect(options.method).toBe('POST');
         const body = JSON.parse(options.body);
         expect(body).toEqual({
@@ -217,16 +224,16 @@ describe('/lib/loggly/loggly-wrapper', () => {
 
       const originalDateNow = Date.now;
       let dateNowCallCounter = 0;
-      // eslint-disable-next-line no-plusplus
+
       Date.now = jest.fn(() => (dateNowCallCounter++ > 0 ? 5000 : 0));
 
       fetchMock.mockImplementation((url, options) => {
-        expect(url).toBe('https://logs-01.loggly.com/inputs/test-loggly-token/tag/test-service-development/');
+        expect(url).toBe(
+          'https://logs-01.loggly.com/inputs/test-loggly-token/tag/test-service-development/',
+        );
         expect(options.method).toBe('POST');
         const body = JSON.parse(options.body);
-        const {
-          level, duration, fake, msg, timerLabel, shortStack, fullStack,
-        } = body;
+        const { level, duration, fake, msg, timerLabel, shortStack, fullStack } = body;
         expect(level).toBe('error');
         expect(duration).toBe('00:00:05.000');
         expect(fake).toBe('fake-extra-data');
@@ -250,17 +257,18 @@ describe('/lib/loggly/loggly-wrapper', () => {
       Logger.setLevel('info');
 
       fetchMock.mockImplementation((url, options) => {
-        expect(url).toBe('https://logs-01.loggly.com/inputs/test-loggly-token/tag/test-service-development/');
+        expect(url).toBe(
+          'https://logs-01.loggly.com/inputs/test-loggly-token/tag/test-service-development/',
+        );
         expect(options.method).toBe('POST');
         const body = JSON.parse(options.body);
-        const {
-          level, duration, timerLabel,
-        } = body;
+        const { level, duration, timerLabel } = body;
 
         expect(level).toBe('info');
-        const durationTextStart = 'Missing label "my-time-label-missing" in timeEnd()\n'
-          + 'Error\n'
-          + '    at Logger.writeTimeEnd';
+        const durationTextStart =
+          'Missing label "my-time-label-missing" in timeEnd()\n' +
+          'Error\n' +
+          '    at Logger.writeTimeEnd';
         expect(duration.startsWith(durationTextStart)).toBe(true);
         expect(timerLabel).toBe('my-time-label-missing');
 
@@ -309,12 +317,12 @@ describe('/lib/loggly/loggly-wrapper', () => {
     };
 
     fetchMock.mockImplementation((url, options) => {
-      expect(url).toBe('https://logs-01.loggly.com/inputs/test-loggly-token/tag/test-service-development/');
+      expect(url).toBe(
+        'https://logs-01.loggly.com/inputs/test-loggly-token/tag/test-service-development/',
+      );
       expect(options.method).toBe('POST');
       const body = JSON.parse(options.body);
-      const {
-        fullStack, shortStack, msg,
-      } = body;
+      const { fullStack, shortStack, msg } = body;
 
       expect(fullStack).toBeTruthy();
       expect(shortStack).toBeTruthy();
@@ -342,9 +350,7 @@ describe('/lib/loggly/loggly-wrapper', () => {
 
     fetchMock.mockImplementation((url, options) => {
       const body = JSON.parse(options.body);
-      const {
-        fullStack, shortStack, msg,
-      } = body;
+      const { fullStack, shortStack, msg } = body;
 
       expect(fullStack).toBeTruthy();
       expect(shortStack).toBeTruthy();
@@ -398,10 +404,10 @@ describe('/lib/loggly/loggly-wrapper', () => {
 
   test('should call res.send when response parameter is included', async () => {
     const res = {
-      send: (obj: any): void => {
+      send: (obj: { success: boolean }): void => {
         expect(obj.success).toBe(false);
       },
-      status: (c: number): any => {
+      status: (c: number): Response => {
         expect(c).toBe(1234);
         return res;
       },
@@ -482,7 +488,9 @@ describe('/lib/loggly/loggly-wrapper', () => {
 
     await testLogger.error({});
     expect(fetch).toHaveBeenCalled();
-    expect(fetchMock.mock.calls[0][0]).toBe('https://logs-01.loggly.com/bulk/test-loggly-token/tag/fake-service-1-development/');
+    expect(fetchMock.mock.calls[0][0]).toBe(
+      'https://logs-01.loggly.com/bulk/test-loggly-token/tag/fake-service-1-development/',
+    );
 
     Logger.setLevel(previousLevel);
   });
@@ -499,5 +507,3 @@ describe('/lib/loggly/loggly-wrapper', () => {
     expect(consoleError).toHaveBeenCalledTimes(1);
   });
 });
-
-/* eslint-enable no-console */

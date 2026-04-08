@@ -6,12 +6,11 @@ Stripped down and modified types for logging from @google-cloud/logging module.
 
 /** Properties of a MonitoredResource. */
 export interface IMonitoredResource {
-
   /** MonitoredResource type */
-  type?: (string|null);
+  type?: string | null;
 
   /** MonitoredResource labels */
-  labels?: ({ [k: string]: string }|null);
+  labels?: { [k: string]: string } | null;
 }
 
 /**
@@ -32,18 +31,17 @@ export const logSeverity = {
 export type LogSeverity = keyof typeof logSeverity;
 
 export interface ILogEntry {
-
   /** LogEntry logName */
-  logName?: (string|null);
+  logName?: string | null;
 
   /** LogEntry resource */
-  resource?: (IMonitoredResource|null);
+  resource?: IMonitoredResource | null;
 
   /** LogEntry protoPayload */
   // protoPayload?: (google.protobuf.IAny|null);
 
   /** LogEntry textPayload */
-  textPayload?: (string|null);
+  textPayload?: string | null;
 
   /** LogEntry jsonPayload */
   jsonPayload?: Record<string, unknown>;
@@ -58,25 +56,25 @@ export interface ILogEntry {
   severity?: LogSeverity;
 
   /** LogEntry insertId */
-  insertId?: (string|null);
+  insertId?: string | null;
 
   /** LogEntry httpRequest */
   // httpRequest?: (google.logging.type.IHttpRequest|null);
 
   /** LogEntry labels */
-  labels?: ({ [k: string]: string }|null);
+  labels?: { [k: string]: string } | null;
 
   /** LogEntry operation */
   // operation?: (google.logging.v2.ILogEntryOperation|null);
 
   /** LogEntry trace */
-  trace?: (string|null);
+  trace?: string | null;
 
   /** LogEntry spanId */
-  spanId?: (string|null);
+  spanId?: string | null;
 
   /** LogEntry traceSampled */
-  traceSampled?: (boolean|null);
+  traceSampled?: boolean | null;
 
   /** LogEntry sourceLocation */
   // sourceLocation?: (google.logging.v2.ILogEntrySourceLocation|null);

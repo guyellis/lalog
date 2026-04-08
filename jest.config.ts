@@ -13,11 +13,7 @@ const config: Config = {
     '!**/test/**',
     '**/*.{js,jsx,ts,tsx}',
   ],
-  coveragePathIgnorePatterns: [
-    '<rootDir>/dist/',
-    '<rootDir>/node_modules/',
-    '<rootDir>/test/',
-  ],
+  coveragePathIgnorePatterns: ['<rootDir>/dist/', '<rootDir>/node_modules/', '<rootDir>/test/'],
   coverageThreshold: {
     global: {
       branches: 100,
@@ -26,10 +22,7 @@ const config: Config = {
       statements: 100,
     },
   },
-  roots: [
-    '<rootDir>/lib/',
-    '<rootDir>/test/',
-  ],
+  roots: ['<rootDir>/lib/', '<rootDir>/test/'],
   setupFilesAfterEnv: ['./test/setup.ts'],
   testEnvironment: 'node',
   testMatch: ['**/test/**/*.test.[t|j]s?(x)'],

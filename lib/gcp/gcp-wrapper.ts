@@ -1,9 +1,7 @@
 import { JWT } from 'google-auth-library';
-import {
-  LogBatch, LogSingle, isObject, safeJsonStringify,
-} from '../utils';
+import { GcpLoggerService, LevelType, logDataEnriched, LogDataOut } from '../local-types';
+import { LogBatch, LogSingle, isObject, safeJsonStringify } from '../utils';
 import { ILogEntry, LogBody, LogSeverity } from './gcp-logging-types';
-import { GcpLoggerService, LevelType } from '../local-types';
 
 const url = 'https://logging.googleapis.com/v2/entries:write';
 
@@ -44,26 +42,19 @@ const getLogSeverity = (level?: LevelType): LogSeverity => {
 
 interface LogOptions {
   tag: string;
-  logObj: any[];
+  logObj: (logDataEnriched | LogDataOut)[];
   serviceCredentials: GcpLoggerService;
 }
 
-const log = async (options: LogOptions, firstCall = true):
- Promise<Record<string, unknown>> => {
-  const {
-    logObj,
-    serviceCredentials,
-    tag,
-  } = options;
-  const {
-    projectId,
-  } = serviceCredentials;
+const log = async (options: LogOptions, firstCall = true): Promise<Record<string, unknown>> => {
+  const { logObj, serviceCredentials, tag } = options;
+  const { projectId } = serviceCredentials;
 
   const accessToken = await getAccessToken(serviceCredentials);
 
   const entries: ILogEntry[] = logObj.map((jsonPayload) => ({
     jsonPayload,
-    severity: getLogSeverity(jsonPayload.level),
+    severity: getLogSeverity(jsonPayload.level as LevelType),
   }));
 
   const logBody: LogBody = {
@@ -92,7 +83,7 @@ const log = async (options: LogOptions, firstCall = true):
     if (firstCall) {
       return log(options, false);
     }
-    // eslint-disable-next-line no-console
+
     console.error(`fetch status is 401: ${result.statusText}`);
     return {};
   }
@@ -102,35 +93,37 @@ const log = async (options: LogOptions, firstCall = true):
   return json;
 };
 
-const logSingleSetup = (serviceCredentials: GcpLoggerService) : LogSingle => async (options) => {
-  const { logObj } = options;
-  if (!isObject(logObj)) {
-    // eslint-disable-next-line no-console
-    console.error(`Expected an Object in logSingle but got ${typeof logObj}`);
-    return Promise.resolve();
-  }
+const logSingleSetup =
+  (serviceCredentials: GcpLoggerService): LogSingle =>
+  async (options) => {
+    const { logObj } = options;
+    if (!isObject(logObj)) {
+      console.error(`Expected an Object in logSingle but got ${typeof logObj}`);
+      return Promise.resolve();
+    }
 
-  return log({
-    ...options,
-    logObj: [logObj],
-    serviceCredentials,
-  });
-};
+    return log({
+      ...options,
+      logObj: [logObj],
+      serviceCredentials,
+    });
+  };
 
-const logBatchSetup = (serviceCredentials: GcpLoggerService): LogBatch => async (options) => {
-  const { logObj } = options;
-  if (!Array.isArray(logObj)) {
-    // eslint-disable-next-line no-console
-    console.error(`Expected an Array in logBatch but got ${typeof logObj}`);
-    return Promise.resolve();
-  }
+const logBatchSetup =
+  (serviceCredentials: GcpLoggerService): LogBatch =>
+  async (options) => {
+    const { logObj } = options;
+    if (!Array.isArray(logObj)) {
+      console.error(`Expected an Array in logBatch but got ${typeof logObj}`);
+      return Promise.resolve();
+    }
 
-  return log({
-    ...options,
-    logObj,
-    serviceCredentials,
-  });
-};
+    return log({
+      ...options,
+      logObj,
+      serviceCredentials,
+    });
+  };
 
 export const forTest = {
   getAccessToken,

@@ -1,5 +1,5 @@
 process.env.LALOG_LEVEL = 'trace';
-// eslint-disable-next-line import/first
+
 import Logger from '../../lib';
 
 describe('/lib/logger-init', () => {

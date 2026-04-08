@@ -9,7 +9,7 @@
   },
   "description": "Logging aggregation and distribution",
   "devDependencies": {
-    "@eslint/js": "9.39.2",
+    "@eslint/js": "10.0.1",
     "@stylistic/eslint-plugin": "5.10.0",
     "@types/express": "5.0.6",
     "@types/jest": "30.0.0",
